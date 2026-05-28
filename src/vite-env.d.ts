@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 
-import {ElectronAPI} from "../types/electron-api.ts";
+import {ElectronAPI} from "../shared/types/electron-api.ts";
 
 declare global {
   interface Window {

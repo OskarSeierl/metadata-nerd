@@ -34,7 +34,8 @@
   },
   "include": [
     "src",
-    "electron"
+    "electron",
+    "shared"
   ],
   "references": [
     {

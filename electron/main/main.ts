@@ -5,6 +5,8 @@ import {createMainWindow} from "./main-window.ts";
 // @ts-ignore
 let mainWindow: BrowserWindow | null = null;
 
+app.disableHardwareAcceleration();
+
 app.whenReady().then(() => {
   mainWindow = createMainWindow();
 });
