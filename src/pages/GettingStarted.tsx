@@ -21,8 +21,8 @@ export function GettingStarted({folderPickerProps, onStartClick, isLoading}: Get
       icon: FolderDetailsIcon,
     },
     {
-      title: "Smart Detection",
-      description: "Automatically identify useful metadata fields and patterns.",
+      title: "Add Missing",
+      description: "Add missing metadata fields like location or date.",
       icon: SearchVisualIcon,
     },
     {
@@ -36,7 +36,7 @@ export function GettingStarted({folderPickerProps, onStartClick, isLoading}: Get
     <section className="mx-auto flex min-h-full w-full max-w-5xl flex-col items-center justify-center gap-8 py-6">
       <div className="space-y-2 text-center">
         <TypographyH1>Welcome to Metadata, Nerd!</TypographyH1>
-        <p className="text-muted-foreground">Analyze folder metadata faster with guided tools.</p>
+        <p className="text-muted-foreground">Analyze and edit image metadata faster with guided tools.</p>
       </div>
 
       <div className="grid w-full gap-4 md:grid-cols-3">

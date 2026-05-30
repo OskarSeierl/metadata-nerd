@@ -3,6 +3,7 @@ import path from 'node:path';
 import {registerWindowHandlers} from "./handlers/window-handlers.ts";
 import {currentDir, RENDERER_DIST, VITE_DEV_SERVER_URL, VITE_PUBLIC} from "./constants.ts";
 import {registerFolderHandlers} from "./handlers/folder-handlers.ts";
+import {registerThumbnailHandler} from "./handlers/thumbnail-handler.ts";
 
 export function createMainWindow(): BrowserWindow {
   const win = new BrowserWindow({
@@ -18,9 +19,10 @@ export function createMainWindow(): BrowserWindow {
     minHeight: 768,
   });
 
-  // Handler binden
+  // Handlers register
   registerWindowHandlers(win);
   registerFolderHandlers(win);
+  registerThumbnailHandler();
 
   if (VITE_DEV_SERVER_URL) {
     win.loadURL(VITE_DEV_SERVER_URL);

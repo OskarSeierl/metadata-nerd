@@ -1,3 +1,5 @@
+import {Image} from "./image.ts";
+
 export interface ElectronAPI {
   window: {
     minimize: () => void;
@@ -6,11 +8,17 @@ export interface ElectronAPI {
   };
   folder: {
     selectFolder: () => Promise<string | null>;
-    readImageFiles: (folderPath: string, includeSubfolders: boolean) => Promise<{
-      success: boolean;
-      files: string[];
-      count: number;
-      error?: string;
-    }>;
+    readImageFiles: (folderPath: string, includeSubfolders: boolean) => Promise<ResponseData<ReadImageFilesResult>>;
   };
+}
+
+export interface ResponseData<T> {
+  success: boolean;
+  error?: string;
+  data: T
+}
+
+export interface ReadImageFilesResult {
+  count: number;
+  images: Image[];
 }

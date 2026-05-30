@@ -1,12 +1,16 @@
 import {useState} from 'react';
 import {FolderPickerProps} from "@/components/FolderPicker.tsx";
 import {GettingStarted} from "@/pages/GettingStarted.tsx";
+import {Image} from "../../shared/types/image.ts";
+import {Editor} from "@/pages/Editor.tsx";
 
 export function Home() {
   const [selectedFolderPath, setSelectedFolderPath] = useState<string | null>(null);
   const [includeSubfolders, setIncludeSubfolders] = useState<boolean>(true);
 
   const [isLoading, setIsLoading] = useState(false);
+
+  const [imageFiles, setImageFiles] = useState<Image[]>([]);
 
   const folderPickerProps: FolderPickerProps = {
     selectedFolder: selectedFolderPath,
@@ -25,8 +29,8 @@ export function Home() {
     try {
       const result = await window.electron?.folder?.readImageFiles?.(selectedFolderPath, includeSubfolders);
       if (result?.success) {
-        console.log(`Found ${result.count} image files:`, result.files);
-        // TODO: Process or navigate with the found image files
+        console.log(`Found ${result.data.count} image files:`, result.data.images);
+        setImageFiles(result.data.images)
       } else {
         console.error('Failed to read image files:', result?.error);
       }
@@ -37,5 +41,9 @@ export function Home() {
     }
   };
 
-  return <GettingStarted folderPickerProps={folderPickerProps} onStartClick={handleStartClick} />;
+  if (!isLoading && imageFiles.length === 0) {
+    return <GettingStarted folderPickerProps={folderPickerProps} onStartClick={handleStartClick}/>;
+  }
+
+  return <Editor isLoading={isLoading} images={imageFiles} />
 }
