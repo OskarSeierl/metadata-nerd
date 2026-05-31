@@ -1,7 +1,7 @@
 import { contextBridge } from 'electron';
 import {ElectronAPI} from "../../shared/types/electron-api.ts";
 import {closeWindow, maximizeWindow, minimizeWindow} from "./window.ts";
-import {selectFolder, readImageFiles} from "./folder.ts";
+import {selectFolder, readImageFiles, onScanProgress, onThumbnailReady} from "./folder.ts";
 
 const api: ElectronAPI = {
   window: {
@@ -12,6 +12,8 @@ const api: ElectronAPI = {
   folder: {
     selectFolder,
     readImageFiles,
+    onScanProgress,
+    onThumbnailReady,
   }
 };
 

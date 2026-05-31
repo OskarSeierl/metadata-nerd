@@ -1,6 +1,6 @@
 import {FolderPicker, FolderPickerProps} from "@/components/FolderPicker.tsx";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card.tsx";
-import {DatabaseSync01Icon, FolderDetailsIcon, SearchVisualIcon} from "@hugeicons/core-free-icons";
+import {DatabaseSync01Icon, File01Icon, Analytics01Icon} from "@hugeicons/core-free-icons";
 import {HugeiconsIcon} from "@hugeicons/react";
 import {TypographyH1} from "@/components/ui/typographyH1.tsx";
 import {Button} from "@/components/ui/button.tsx";
@@ -16,19 +16,19 @@ interface GettingStartedProps {
 export function GettingStarted({folderPickerProps, onStartClick, isLoading}: GettingStartedProps) {
   const featureCards = [
     {
-      title: "Folder Insights",
-      description: "Read and summarize metadata from your selected directory.",
-      icon: FolderDetailsIcon,
-    },
-    {
-      title: "Add Missing",
-      description: "Add missing metadata fields like location or date.",
-      icon: SearchVisualIcon,
-    },
-    {
-      title: "Structured Output",
-      description: "Prepare clean metadata for indexing and analysis workflows.",
+      title: "Edit Metadata",
+      description: "Update and standardize metadata including geolocation and datetime information for better organization.",
       icon: DatabaseSync01Icon,
+    },
+    {
+      title: "Standardize File Names",
+      description: "Edit and normalize file names consistently across your entire image library for universal naming standards.",
+      icon: File01Icon,
+    },
+    {
+      title: "Overview",
+      description: "Get a comprehensive overview of your image library's metadata, including geolocation and datetime distributions, to identify patterns and outliers.",
+      icon: Analytics01Icon,
     },
   ];
 

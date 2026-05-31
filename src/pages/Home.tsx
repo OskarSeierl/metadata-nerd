@@ -1,16 +1,25 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {FolderPickerProps} from "@/components/FolderPicker.tsx";
 import {GettingStarted} from "@/pages/GettingStarted.tsx";
 import {Image} from "../../shared/types/image.ts";
 import {Editor} from "@/pages/Editor.tsx";
+import {ProgressUpdate} from "../../shared/types/electron-api.ts";
+import {ScanLoading} from "@/pages/ScanLoading.tsx";
 
 export function Home() {
   const [selectedFolderPath, setSelectedFolderPath] = useState<string | null>(null);
   const [includeSubfolders, setIncludeSubfolders] = useState<boolean>(true);
 
   const [isLoading, setIsLoading] = useState(false);
+  const [scanProgress, setScanProgress] = useState<ProgressUpdate | null>(null);
 
   const [imageFiles, setImageFiles] = useState<Image[]>([]);
+
+  useEffect(() => {
+    window.electron.folder.onScanProgress((data) => {
+      setScanProgress(data);
+    });
+  }, []);
 
   const folderPickerProps: FolderPickerProps = {
     selectedFolder: selectedFolderPath,
@@ -45,5 +54,9 @@ export function Home() {
     return <GettingStarted folderPickerProps={folderPickerProps} onStartClick={handleStartClick}/>;
   }
 
-  return <Editor isLoading={isLoading} images={imageFiles} />
+  if(isLoading && scanProgress) {
+    return <ScanLoading progress={scanProgress} />
+  }
+
+  return <Editor images={imageFiles} />
 }

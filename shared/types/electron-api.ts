@@ -9,7 +9,14 @@ export interface ElectronAPI {
   folder: {
     selectFolder: () => Promise<string | null>;
     readImageFiles: (folderPath: string, includeSubfolders: boolean) => Promise<ResponseData<ReadImageFilesResult>>;
+    onScanProgress: (callback: (data: ProgressUpdate) => void) => () => void;
+    onThumbnailReady: (callback: (id: string) => void) => () => void;
   };
+}
+
+export interface ProgressUpdate {
+  current: number;
+  total: number;
 }
 
 export interface ResponseData<T> {

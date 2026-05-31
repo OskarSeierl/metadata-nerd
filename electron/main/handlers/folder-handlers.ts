@@ -7,10 +7,13 @@ import {Image, ImageMetadata} from "shared/types/image.ts";
 import exifr from 'exifr';
 import {getCachedImage, saveCachedImage} from '../database';
 import {ReadImageFilesResult, ResponseData} from "../../../shared/types/electron-api.ts";
+import {processThumbnailsInBackground} from "./thumbnail-handler.ts";
 
-import {generateAndStoreThumbnail} from "./thumbnail-handler.ts";
-
-export async function readImageFilesRecursive(dir: string, recursive: boolean): Promise<Image[]> {
+export async function readImageFilesRecursive(
+  dir: string,
+  recursive: boolean,
+  onProgress?: (current: number, total: number) => void
+): Promise<Image[]> {
   const imagePaths: string[] = [];
 
   // 1. FAST PHASE: Just find all the valid file paths first
@@ -39,41 +42,35 @@ export async function readImageFilesRecursive(dir: string, recursive: boolean): 
 
   await walk(dir);
 
-  // 2. HEAVY PHASE: Read metadata for all found images concurrently
-  return await Promise.all(
-    imagePaths.map(async (filePath) => {
+  let currentProgress = 0;
+
+  onProgress?.(currentProgress, imagePaths.length);
+
+  const CHUNK_SIZE = 50;
+
+  let results: Image[] = [];
+
+  // 2. HEAVY PHASE: In Chunks aufteilen, damit Node.js atmen kann
+  for (let i = 0; i < imagePaths.length; i += CHUNK_SIZE) {
+    const chunk = imagePaths.slice(i, i + CHUNK_SIZE);
+
+    const chunkPromises = chunk.map(async (filePath) => {
+      const id = crypto.createHash('md5').update(filePath).digest('hex');
       try {
-        // Check file modification time
         const stats = await fs.stat(filePath);
         const mtime = Math.floor(stats.mtimeMs / 1000);
 
-        // Eindeutige ID für das Bild und das Thumbnail generieren
-        const id = crypto.createHash('md5').update(filePath).digest('hex');
-
-        // Try to get from cache first
         const cached = getCachedImage(filePath, mtime);
         if (cached) {
-          console.log(`Cache hit: ${filePath}`);
-          return {...cached, fromCache: true};
+          return {...cached, fromCache: true} as Image;
         }
 
-        // Not in cache or invalidated, read metadata
-        console.log(`Cache miss: ${filePath}`);
+        const exifData = await exifr.parse(filePath, {
+          exif: true,
+          makerNote: false,
+          gps: true
+        }).catch(() => null);
 
-        // Read metadata and thumbnail in parallel
-        const [exifData, _] = await Promise.all([
-          exifr.parse(filePath, {
-            exif: true,
-            makerNote: false,
-            gps: true
-          }).catch(e => {
-            console.warn(`Could not parse EXIF for ${filePath}`, e);
-            return null;
-          }),
-          generateAndStoreThumbnail(filePath, id),
-        ]);
-
-        // Map exifr data to our typed ImageMetadata interface
         const metadata: ImageMetadata | null = exifData ? {
           make: exifData.Make,
           model: exifData.Model,
@@ -126,42 +123,42 @@ export async function readImageFilesRecursive(dir: string, recursive: boolean): 
           sharpness: exifData.Sharpness,
         } : null;
 
-        // Save to cache (with optional thumbId)
         saveCachedImage(id, filePath, path.basename(filePath), metadata, mtime);
 
-        const now = Math.floor(Date.now() / 1000);
         return {
           id,
           fullPath: filePath,
           filename: path.basename(filePath),
           metadata,
           fileModificationTime: mtime,
-          cachedAt: now,
+          cachedAt: Math.floor(Date.now() / 1000),
           fromCache: false,
         } as Image;
 
       } catch (error) {
-        console.warn(`Critical error processing ${filePath}`, error);
-
-        const stats = await fs.stat(filePath).catch(() => null);
-        const mtime = stats ? Math.floor(stats.mtimeMs / 1000) : 0;
-        const now = Math.floor(Date.now() / 1000);
-
-        // Fallback ID falls sogar der Dateizugriff scheitert, aber wir den Pfad haben
         const fallbackId = crypto.createHash('md5').update(filePath).digest('hex');
-
         return {
           id: fallbackId,
           fullPath: filePath,
           filename: path.basename(filePath),
           metadata: null,
-          fileModificationTime: mtime,
-          cachedAt: now,
+          fileModificationTime: 0,
+          cachedAt: Math.floor(Date.now() / 1000),
           fromCache: false,
         } as Image;
+      } finally {
+        currentProgress++;
+        onProgress?.(currentProgress, imagePaths.length);
       }
-    })
-  );
+    });
+
+    const chunkResults = await Promise.all(chunkPromises);
+    results.push(...chunkResults);
+
+    await new Promise(resolve => setTimeout(resolve, 1));
+  }
+
+  return results;
 }
 
 export function registerFolderHandlers(mainWindow: BrowserWindow) {
@@ -177,13 +174,22 @@ export function registerFolderHandlers(mainWindow: BrowserWindow) {
     return result.filePaths[0];
   });
 
-  ipcMain.handle('read-image-files', async (_event, folderPath: string, includeSubfolders: boolean): Promise<ResponseData<ReadImageFilesResult>> => {
+  ipcMain.handle('read-image-files', async (event, folderPath: string, includeSubfolders: boolean): Promise<ResponseData<ReadImageFilesResult>> => {
     try {
       if (!folderPath) {
         throw new Error('Folder path is required');
       }
 
-      const imageFiles = await readImageFilesRecursive(folderPath, includeSubfolders);
+      const imageFiles = await readImageFilesRecursive(
+        folderPath,
+        includeSubfolders,
+        (current, total) => {
+          event.sender.send('read-image-files-progress', {current, total})
+        }
+      );
+
+      processThumbnailsInBackground(imageFiles, event.sender);
+
       return {
         success: true,
         data: {

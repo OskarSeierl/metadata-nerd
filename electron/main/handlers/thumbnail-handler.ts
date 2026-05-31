@@ -3,10 +3,26 @@ import path from "node:path";
 import {promises as fs} from "fs";
 import exifr from "exifr";
 import sharp from "sharp";
+import {Image} from "../../../shared/types/image.ts";
 
 protocol.registerSchemesAsPrivileged([
   {scheme: 'thumb', privileges: {bypassCSP: true, standard: true, secure: true, supportFetchAPI: true}}
 ]);
+
+export const processThumbnailsInBackground = async (images: Image[], sender: Electron.WebContents) => {
+  for (const img of images) {
+    if (img.fromCache) continue;
+
+    try {
+      const success = await generateAndStoreThumbnail(img.fullPath, img.id);
+      if (success) {
+        sender.send('thumbnail-ready', img.id);
+      }
+    } catch (error) {
+      console.error(`Failed background thumbnail for ${img.id}`, error);
+    }
+  }
+}
 
 export const registerThumbnailHandler = () => {
   protocol.handle('thumb', async (request) => {
@@ -43,17 +59,17 @@ const geThumbnailPathFromFilename = (filename: string) => {
  * First attempts to extract embedded thumbnail, falls back to generating one with sharp.
  * Returns the thumbId if successful, null otherwise.
  */
-export async function generateAndStoreThumbnail(
+export const generateAndStoreThumbnail = async (
   filePath: string,
   thumbId: string
-): Promise<string | null> {
+): Promise<boolean> => {
   try {
     // Check if thumbnail already exists
     const thumbPath = getThumbnailPathFromID(thumbId);
     try {
       await fs.access(thumbPath);
       console.log(`Thumbnail already exists: ${thumbPath}`);
-      return thumbId;
+      return true;
     } catch {
       // File doesn't exist, proceed with generation
     }
@@ -77,7 +93,7 @@ export async function generateAndStoreThumbnail(
         console.log(`Generated fallback thumbnail for: ${path.basename(filePath)}`);
       } catch (sharpError) {
         console.warn(`Could not generate thumbnail for ${filePath}`, sharpError);
-        return null;
+        return false;
       }
     }
 
@@ -87,12 +103,11 @@ export async function generateAndStoreThumbnail(
       await fs.writeFile(thumbPath, thumbData).catch((err) => {
         console.warn(`Failed to write thumbnail for ${filePath}`, err);
       });
-      return thumbId;
+      return true;
     }
-
-    return null;
   } catch (error) {
     console.error(`Error generating thumbnail for ${filePath}:`, error);
-    return null;
   }
+
+  return false;
 }
