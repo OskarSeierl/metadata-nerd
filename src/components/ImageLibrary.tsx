@@ -3,15 +3,12 @@ import {Image} from "../../shared/types/image.ts";
 import {ImageLibraryToolbar} from "@/components/ImageLibraryToolbar.tsx";
 import {ImageLibraryCards} from "@/components/ImageLibraryCards.tsx";
 import {ImageLibraryTable} from "@/ImageLibraryTable.tsx";
+import {ImageFilter, SortDirection, SortKey, ViewMode} from "@/types/image-library.ts";
 
 interface ImageLibraryProps {
   images: Image[];
   onSelectedChange: (selectedImageIds: Image[]) => void;
 }
-
-export type ViewMode = 'grid' | 'table';
-export type SortKey = keyof Pick<Image, 'filename' | 'fullPath' | 'fileModificationTime'>;
-export type SortDirection = 'asc' | 'desc';
 
 export function ImageLibrary({images, onSelectedChange}: ImageLibraryProps) {
   const [selectedImages, setSelectedImages] = useState<Set<Image>>(new Set());
@@ -20,7 +17,7 @@ export function ImageLibrary({images, onSelectedChange}: ImageLibraryProps) {
 
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
 
-  const [filters, setFilters] = useState<string[]>([]);
+  const [filters, setFilters] = useState<ImageFilter[]>([]);
   const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: SortDirection }>({
     key: 'filename',
     direction: 'asc'
@@ -68,9 +65,10 @@ export function ImageLibrary({images, onSelectedChange}: ImageLibraryProps) {
 
   // --- Data Pipeline ---
   const processedImages = useMemo(() => {
+    console.log(images[3]);
     let result = images.filter(img => {
-      if (filters.includes('no-location') && img.metadata?.gpsAltitude) return false;
-      if (filters.includes('no-time') && img.metadata?.dateTime) return false;
+      if (filters.includes(ImageFilter.NO_LOCATION) && img.metadata?.gpsLatitude) return false;
+      if (filters.includes(ImageFilter.NO_TIME) && img.metadata?.dateTimeOriginal) return false;
       return true;
     });
 

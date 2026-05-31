@@ -1,11 +1,11 @@
 import {FolderPicker, FolderPickerProps} from "@/components/FolderPicker.tsx";
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card.tsx";
 import {DatabaseSync01Icon, File01Icon, Analytics01Icon} from "@hugeicons/core-free-icons";
 import {HugeiconsIcon} from "@hugeicons/react";
 import {TypographyH1} from "@/components/ui/typographyH1.tsx";
 import {Button} from "@/components/ui/button.tsx";
 
 import {Spinner} from "@/components/ui/spinner.tsx";
+import {Item, ItemContent, ItemDescription, ItemMedia, ItemTitle} from "@/components/ui/item.tsx";
 
 interface GettingStartedProps {
   folderPickerProps: FolderPickerProps;
@@ -41,15 +41,17 @@ export function GettingStarted({folderPickerProps, onStartClick, isLoading}: Get
 
       <div className="grid w-full gap-4 md:grid-cols-3">
         {featureCards.map((feature) => (
-          <Card key={feature.title} className="h-full">
-            <CardHeader>
-              <HugeiconsIcon icon={feature.icon} className="size-5 text-primary"/>
-              <CardTitle>{feature.title}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>{feature.description}</CardDescription>
-            </CardContent>
-          </Card>
+          <Item variant="outline" key={feature.title}>
+            <ItemMedia variant="icon">
+              <HugeiconsIcon icon={feature.icon}/>
+            </ItemMedia>
+            <ItemContent>
+              <ItemTitle>{feature.title}</ItemTitle>
+              <ItemDescription>
+                {feature.description}
+              </ItemDescription>
+            </ItemContent>
+          </Item>
         ))}
       </div>
 

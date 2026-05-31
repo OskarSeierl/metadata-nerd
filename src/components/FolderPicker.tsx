@@ -2,10 +2,10 @@ import {useState} from 'react';
 import {Button} from '@/components/ui/button.tsx';
 import {Switch} from '@/components/ui/switch.tsx';
 import {Spinner} from '@/components/ui/spinner.tsx';
-import {Card, CardContent, CardDescription, CardTitle} from '@/components/ui/card.tsx';
 import {Alert, AlertTitle, AlertDescription} from '@/components/ui/alert.tsx';
 import {FolderOpenIcon, CheckListIcon, AlertCircleIcon} from '@hugeicons/core-free-icons';
 import {HugeiconsIcon} from '@hugeicons/react';
+import {Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle} from "@/components/ui/item.tsx";
 
 export interface FolderPickerProps {
   selectedFolder: string | null;
@@ -57,30 +57,33 @@ export function FolderPicker({selectedFolder, includeSubfolders, onFolderSelect,
 
       {selectedFolder && (
         <>
-          <Alert>
-            <HugeiconsIcon icon={CheckListIcon}/>
-            <AlertTitle>Folder Selected</AlertTitle>
-            <AlertDescription>
-              <span className="break-all font-mono font-medium">{selectedFolder}</span>
-            </AlertDescription>
-          </Alert>
-          <Card>
-            <CardContent>
-              <div className="flex items-center justify-between gap-4">
-                <div className="text-left">
-                  <CardTitle>Include subfolders</CardTitle>
-                  <CardDescription>
-                    {includeSubfolders ? 'Scanning subdirectories' : 'Only this folder'}
-                  </CardDescription>
-                </div>
-                <Switch
-                  checked={includeSubfolders}
-                  onCheckedChange={onIncludeSubfoldersChange}
-                  aria-label="Include subfolders"
-                />
-              </div>
-            </CardContent>
-          </Card>
+          <Item variant="outline">
+            <ItemMedia variant="icon">
+              <HugeiconsIcon icon={CheckListIcon}/>
+            </ItemMedia>
+            <ItemContent>
+              <ItemTitle>Folder Selected</ItemTitle>
+              <ItemDescription>
+                <span className="break-all font-mono font-medium">{selectedFolder}</span>
+              </ItemDescription>
+            </ItemContent>
+          </Item>
+          <Item variant="outline">
+            <ItemMedia variant="icon">
+              <HugeiconsIcon icon={FolderOpenIcon}/>
+            </ItemMedia>
+            <ItemContent>
+              <ItemTitle>Include subfolders</ItemTitle>
+              <ItemDescription>{includeSubfolders ? 'Scanning subdirectories' : 'Only this folder'}</ItemDescription>
+            </ItemContent>
+            <ItemActions>
+              <Switch
+                checked={includeSubfolders}
+                onCheckedChange={onIncludeSubfoldersChange}
+                aria-label="Include subfolders"
+              />
+            </ItemActions>
+          </Item>
         </>
       )}
 

@@ -12,8 +12,6 @@ interface ImageCardProps {
 }
 
 export const ImageCard = memo(function ImageCard({ img, isSelected, onToggle, loaded }: ImageCardProps) {
-  const canAttemptLoad = img.fromCache || loaded;
-
   return (
     <div
       onClick={() => onToggle(img)}
@@ -30,7 +28,7 @@ export const ImageCard = memo(function ImageCard({ img, isSelected, onToggle, lo
         />
       </div>
 
-      {canAttemptLoad ? (
+      {loaded ? (
         <img
           src={`thumb://${img.id}.jpg`}
           alt={img.filename}

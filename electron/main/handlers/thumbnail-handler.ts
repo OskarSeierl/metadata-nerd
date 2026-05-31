@@ -11,8 +11,6 @@ protocol.registerSchemesAsPrivileged([
 
 export const processThumbnailsInBackground = async (images: Image[], sender: Electron.WebContents) => {
   for (const img of images) {
-    if (img.fromCache) continue;
-
     try {
       const success = await generateAndStoreThumbnail(img.fullPath, img.id);
       if (success) {

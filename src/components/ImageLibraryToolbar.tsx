@@ -8,14 +8,14 @@ import {
   ListViewIcon,
   MinusSignCircleIcon
 } from "@hugeicons/core-free-icons";
-import {ViewMode} from "@/components/ImageLibrary.tsx";
+import {ImageFilter, ViewMode} from "@/types/image-library.ts";
 
 interface ImageLibraryToolbarProps {
   selectedCount: number;
   totalCount: number;
   onToggleSelectAll: (checked: boolean) => void;
-  filters: string[];
-  onFiltersChange: (filters: string[]) => void;
+  filters: ImageFilter[];
+  onFiltersChange: (filters: ImageFilter[]) => void;
   viewMode: ViewMode;
   onViewModeChange: (mode: ViewMode) => void;
 }
@@ -43,11 +43,11 @@ export const ImageLibraryToolbar = memo(function ImageLibraryToolbar({
         </div>
 
         <ToggleGroup type="multiple" value={filters} onValueChange={onFiltersChange} className="border rounded-md px-1">
-          <ToggleGroupItem value="no-location" aria-label="Ohne GPS" title="Bilder ohne GPS anzeigen">
+          <ToggleGroupItem value={ImageFilter.NO_LOCATION} aria-label="Ohne GPS" title="Bilder ohne GPS anzeigen">
             <HugeiconsIcon icon={MinusSignCircleIcon} className="h-4 w-4 mr-2"/>
             <span className="text-xs">Ohne GPS</span>
           </ToggleGroupItem>
-          <ToggleGroupItem value="no-time" aria-label="Ohne Zeitstempel" title="Bilder ohne Zeitstempel anzeigen">
+          <ToggleGroupItem value={ImageFilter.NO_TIME} aria-label="Ohne Zeitstempel" title="Bilder ohne Zeitstempel anzeigen">
             <HugeiconsIcon icon={Clock01Icon} className="h-4 w-4 mr-2"/>
             <span className="text-xs">Ohne Zeit</span>
           </ToggleGroupItem>
