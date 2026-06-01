@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { Image } from "../../shared/types/image.ts";
+import { Image } from "../../../shared/types/image.ts";
 import { Checkbox } from "@/components/ui/checkbox.tsx";
 import {TableCell, TableRow} from "@/components/ui/table.tsx";
 

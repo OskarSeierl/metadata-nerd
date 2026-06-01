@@ -22,7 +22,7 @@ export function FolderPicker({selectedFolder, includeSubfolders, onFolderSelect,
     setIsLoading(true);
     setError(null);
     try {
-      const folderPath = await window.electron?.folder?.selectFolder?.();
+      const folderPath = await window.electron?.file?.selectFolder?.();
       if (folderPath) {
         onFolderSelect?.(folderPath);
       }

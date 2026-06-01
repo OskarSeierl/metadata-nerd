@@ -1,5 +1,5 @@
 import {Image} from "../../shared/types/image.ts";
-import {ImageLibrary} from "@/components/ImageLibrary.tsx";
+import {ImageLibrary} from "@/components/library/ImageLibrary.tsx";
 import {useState} from "react";
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from "@/components/ui/resizable.tsx";
 

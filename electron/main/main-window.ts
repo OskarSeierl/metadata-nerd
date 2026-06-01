@@ -1,11 +1,11 @@
 import { BrowserWindow } from 'electron';
 import path from 'node:path';
 import {registerWindowHandlers} from "./handlers/window-handlers.ts";
-import {currentDir, RENDERER_DIST, VITE_DEV_SERVER_URL, VITE_PUBLIC} from "./constants.ts";
-import {registerFolderHandlers} from "./handlers/folder-handlers.ts";
+import {currentDir, RENDERER_DIST, VITE_DEV_SERVER_URL, VITE_PUBLIC} from "./constants/constants.ts";
+import {registerImageHandlers} from "./handlers/image-handlers.ts";
 import {registerThumbnailHandler} from "./handlers/thumbnail-handler.ts";
 
-export function createMainWindow(): BrowserWindow {
+export const createMainWindow = (): BrowserWindow => {
   const win = new BrowserWindow({
     icon: path.join(VITE_PUBLIC, 'electron-vite.svg'),
     frame: false,
@@ -21,7 +21,7 @@ export function createMainWindow(): BrowserWindow {
 
   // Handlers register
   registerWindowHandlers(win);
-  registerFolderHandlers(win);
+  registerImageHandlers(win);
   registerThumbnailHandler();
 
   if (VITE_DEV_SERVER_URL) {

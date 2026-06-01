@@ -6,12 +6,15 @@ export interface ElectronAPI {
     maximize: () => void;
     close: () => void;
   };
-  folder: {
+  file: {
     selectFolder: () => Promise<string | null>;
     readImageFiles: (folderPath: string, includeSubfolders: boolean) => Promise<ResponseData<ReadImageFilesResult>>;
     onScanProgress: (callback: (data: ProgressUpdate) => void) => () => void;
     onThumbnailReady: (callback: (id: string) => void) => () => void;
-  };
+  },
+  settings: {
+    deleteCache: () => Promise<ResponseData<null>>;
+  }
 }
 
 export interface ProgressUpdate {

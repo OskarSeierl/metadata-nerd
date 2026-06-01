@@ -9,7 +9,7 @@ const api: ElectronAPI = {
     maximize: maximizeWindow,
     close: closeWindow,
   },
-  folder: {
+  file: {
     selectFolder,
     readImageFiles,
     onScanProgress,

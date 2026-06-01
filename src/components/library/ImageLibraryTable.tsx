@@ -1,10 +1,10 @@
 import {memo} from "react";
 import {Button} from "@/components/ui/button.tsx";
 import {Table, TableBody, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
-import {ImageTableRow} from "@/components/ImageTableRow.tsx";
+import {ImageTableRow} from "@/components/library/ImageTableRow.tsx";
 import {HugeiconsIcon} from "@hugeicons/react";
 import {ArrowDown10, ArrowUp10, ArrowUpDown} from "@hugeicons/core-free-icons";
-import {Image} from "../shared/types/image.ts";
+import {Image} from "../../../shared/types/image.ts";
 
 type SortKey = keyof Pick<Image, 'filename' | 'fullPath' | 'fileModificationTime'>;
 type SortDirection = 'asc' | 'desc';

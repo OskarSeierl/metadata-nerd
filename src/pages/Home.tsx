@@ -16,7 +16,7 @@ export function Home() {
   const [imageFiles, setImageFiles] = useState<Image[]>([]);
 
   useEffect(() => {
-    window.electron.folder.onScanProgress((data) => {
+    window.electron.file.onScanProgress((data) => {
       setScanProgress(data);
     });
   }, []);
@@ -36,7 +36,7 @@ export function Home() {
 
     setIsLoading(true);
     try {
-      const result = await window.electron?.folder?.readImageFiles?.(selectedFolderPath, includeSubfolders);
+      const result = await window.electron?.file?.readImageFiles?.(selectedFolderPath, includeSubfolders);
       if (result?.success) {
         console.log(`Found ${result.data.count} image files:`, result.data.images);
         setImageFiles(result.data.images)

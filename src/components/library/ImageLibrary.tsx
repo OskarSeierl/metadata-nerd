@@ -1,8 +1,8 @@
 import {useCallback, useEffect, useMemo, useState} from "react";
-import {Image} from "../../shared/types/image.ts";
-import {ImageLibraryToolbar} from "@/components/ImageLibraryToolbar.tsx";
-import {ImageLibraryCards} from "@/components/ImageLibraryCards.tsx";
-import {ImageLibraryTable} from "@/ImageLibraryTable.tsx";
+import {Image} from "../../../shared/types/image.ts";
+import {ImageLibraryToolbar} from "@/components/library/ImageLibraryToolbar.tsx";
+import {ImageLibraryCards} from "@/components/library/ImageLibraryCards.tsx";
+import {ImageLibraryTable} from "@/components/library/ImageLibraryTable.tsx";
 import {ImageFilter, SortDirection, SortKey, ViewMode} from "@/types/image-library.ts";
 
 interface ImageLibraryProps {
@@ -24,7 +24,7 @@ export function ImageLibrary({images, onSelectedChange}: ImageLibraryProps) {
   });
 
   useEffect(() => {
-    const cleanup = window.electron?.folder?.onThumbnailReady?.((readyId: string) => {
+    const cleanup = window.electron?.file?.onThumbnailReady?.((readyId: string) => {
       setLoadedThumbnails(current => new Set(current).add(readyId));
     });
     return cleanup;

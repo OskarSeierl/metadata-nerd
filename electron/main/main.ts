@@ -1,6 +1,7 @@
 import { app, BrowserWindow } from 'electron';
 import {createMainWindow} from "./main-window.ts";
-import {initializeDatabase, closeDatabase} from './database';
+import {initializeDatabase, closeDatabase} from './services/database-service.ts';
+import {initializeThumbnailDir} from "./services/thumbnail-service.ts";
 
 // Globale Referenz, um Garbage Collection zu verhindern
 // @ts-ignore
@@ -17,8 +18,9 @@ process.on('uncaughtException', (error) => {
 });
 
 app.whenReady()
-  .then(() => {
+  .then(async () => {
     initializeDatabase();
+    await initializeThumbnailDir();
     mainWindow = createMainWindow();
   })
   .catch((error) => {

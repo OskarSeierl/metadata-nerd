@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { app } from 'electron';
-import { Image, ImageMetadata } from 'shared/types/image';
+import { Image, ImageMetadata } from '../../../shared/types/image.ts';
 import Database from 'better-sqlite3';
 
 let db: Database.Database | null = null;
@@ -17,7 +17,7 @@ export const clearAllData = () => {
   console.log('All data cleared.');
 }
 
-export function initializeDatabase(): Database.Database {
+export const initializeDatabase = (): Database.Database => {
   if (db) {
     return db;
   }
@@ -27,8 +27,6 @@ export function initializeDatabase(): Database.Database {
 
   db = new Database(dbPath);
   db.pragma('journal_mode = WAL'); // Write-Ahead Logging for better concurrency
-
-  clearAllData();
 
   // Create tables if they don't exist
   db.exec(`
@@ -48,7 +46,7 @@ export function initializeDatabase(): Database.Database {
   return db;
 }
 
-export function getDatabase(): Database.Database {
+export const getDatabase = (): Database.Database => {
   if (!db) {
     return initializeDatabase();
   }
@@ -56,7 +54,7 @@ export function getDatabase(): Database.Database {
 }
 
 
-export function getCachedImage(filePath: string, currentMtime: number): Image | null {
+export const getCachedImage = (filePath: string, currentMtime: number): Image | null => {
   const database = getDatabase();
 
   const stmt = database.prepare(`
@@ -87,13 +85,13 @@ export function getCachedImage(filePath: string, currentMtime: number): Image | 
   };
 }
 
-export function saveCachedImage(
+export const saveCachedImage = (
   id: string,
   filePath: string,
   filename: string,
   metadata: ImageMetadata | null,
   mtime: number
-): void {
+): void => {
   const database = getDatabase();
 
   const stmt = database.prepare(`
@@ -111,21 +109,7 @@ export function saveCachedImage(
   stmt.run(id, filePath, filename, mtime, JSON.stringify(metadata), now);
 }
 
-export function clearOldCache(daysBefore: number = 30): number {
-  const database = getDatabase();
-
-  const cutoffTime = Math.floor(Date.now() / 1000) - daysBefore * 24 * 60 * 60;
-
-  const stmt = database.prepare(`
-    DELETE FROM image_cache
-    WHERE cached_at < ?
-  `);
-
-  const result = stmt.run(cutoffTime);
-  return result.changes;
-}
-
-export function closeDatabase(): void {
+export const closeDatabase = (): void => {
   if (db) {
     db.close();
     db = null;

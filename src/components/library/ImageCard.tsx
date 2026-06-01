@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { Image } from "../../shared/types/image.ts";
+import { Image } from "../../../shared/types/image.ts";
 import { Checkbox } from "@/components/ui/checkbox.tsx";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Image01Icon } from "@hugeicons/core-free-icons";

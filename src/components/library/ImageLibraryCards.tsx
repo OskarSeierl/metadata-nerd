@@ -1,6 +1,6 @@
 import {memo} from "react";
-import {Image} from "../../shared/types/image.ts";
-import {ImageCard} from "@/components/ImageCard.tsx";
+import {Image} from "../../../shared/types/image.ts";
+import {ImageCard} from "@/components/library/ImageCard.tsx";
 import {
   Select,
   SelectContent,
