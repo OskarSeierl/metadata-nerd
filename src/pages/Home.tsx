@@ -5,6 +5,7 @@ import {Image} from "../../shared/types/image.ts";
 import {Editor} from "@/pages/Editor.tsx";
 import {ProgressUpdate} from "../../shared/types/electron-api.ts";
 import {ScanLoading} from "@/pages/ScanLoading.tsx";
+import {parseResponse} from "@/lib/response-parser.ts";
 
 export function Home() {
   const [selectedFolderPath, setSelectedFolderPath] = useState<string | null>(null);
@@ -35,19 +36,11 @@ export function Home() {
     }
 
     setIsLoading(true);
-    try {
-      const result = await window.electron?.file?.readImageFiles?.(selectedFolderPath, includeSubfolders);
-      if (result?.success) {
-        console.log(`Found ${result.data.count} image files:`, result.data.images);
-        setImageFiles(result.data.images)
-      } else {
-        console.error('Failed to read image files:', result?.error);
-      }
-    } catch (error) {
-      console.error('Error reading image files:', error);
-    } finally {
-      setIsLoading(false);
+    const result = await parseResponse(window.electron.file.readImageFiles(selectedFolderPath, includeSubfolders));
+    if (result) {
+      setImageFiles(result.images);
     }
+    setIsLoading(false);
   };
 
   if (!isLoading && imageFiles.length === 0) {

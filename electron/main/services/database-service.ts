@@ -12,9 +12,7 @@ export const clearAllData = () => {
   }
 
   // Clear the main table
-  db.prepare('DROP TABLE image_cache').run();
-
-  console.log('All data cleared.');
+  db.prepare('DELETE FROM image_cache').run();
 }
 
 export const initializeDatabase = (): Database.Database => {

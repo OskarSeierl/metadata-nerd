@@ -7,25 +7,25 @@ export interface ElectronAPI {
     close: () => void;
   };
   file: {
-    selectFolder: () => Promise<string | null>;
-    readImageFiles: (folderPath: string, includeSubfolders: boolean) => Promise<ResponseData<ReadImageFilesResult>>;
+    selectFolder: () => Promise<ApiResponse<string>>;
+    readImageFiles: (folderPath: string, includeSubfolders: boolean) => Promise<ApiResponse<ReadImageFilesResult>>;
     onScanProgress: (callback: (data: ProgressUpdate) => void) => () => void;
     onThumbnailReady: (callback: (id: string) => void) => () => void;
   },
   settings: {
-    deleteCache: () => Promise<ResponseData<null>>;
+    deleteCache: () => Promise<ApiResponse<void>>;
   }
+}
+
+export interface ApiResponse<T = undefined> {
+  success: boolean;
+  data?: T;
+  message: string;
 }
 
 export interface ProgressUpdate {
   current: number;
   total: number;
-}
-
-export interface ResponseData<T> {
-  success: boolean;
-  error?: string;
-  data: T
 }
 
 export interface ReadImageFilesResult {

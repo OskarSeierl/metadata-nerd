@@ -9,6 +9,14 @@ protocol.registerSchemesAsPrivileged([
   { scheme: 'thumb', privileges: { bypassCSP: true, standard: true, secure: true, supportFetchAPI: true } },
 ]);
 
+export const clearThumbnails = async (): Promise<void> => {
+  const dir = getThumbnailsDir();
+
+  await fs.access(dir);
+  const files = await fs.readdir(dir);
+  await Promise.all(files.map(file => fs.unlink(path.join(dir, file))));
+}
+
 export const getThumbnailsDir = (): string => {
   return path.join(app.getPath('userData'), 'thumbnails');
 };

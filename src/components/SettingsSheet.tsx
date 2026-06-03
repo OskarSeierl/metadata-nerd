@@ -12,6 +12,7 @@ import {HugeiconsIcon} from "@hugeicons/react";
 import {Delete01Icon} from "@hugeicons/core-free-icons";
 import {useState} from "react";
 import {Spinner} from "@/components/ui/spinner.tsx";
+import {parseResponse} from "@/lib/response-parser.ts";
 
 interface SettingsSheetProps {
   open: boolean;
@@ -23,7 +24,8 @@ export function SettingsSheet({open, onOpenChange}: SettingsSheetProps) {
 
   const handleClearCache = async () => {
     setIsClearingCache(true);
-    // TODO
+    await parseResponse(window.electron.settings.deleteCache());
+    setIsClearingCache(false);
   }
 
   return (

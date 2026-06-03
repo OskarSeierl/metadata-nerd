@@ -4,6 +4,7 @@ import {registerWindowHandlers} from "./handlers/window-handlers.ts";
 import {currentDir, RENDERER_DIST, VITE_DEV_SERVER_URL, VITE_PUBLIC} from "./constants/constants.ts";
 import {registerImageHandlers} from "./handlers/image-handlers.ts";
 import {registerThumbnailHandler} from "./handlers/thumbnail-handler.ts";
+import {registerSettingsHandlers} from "./handlers/settings-handler.ts";
 
 export const createMainWindow = (): BrowserWindow => {
   const win = new BrowserWindow({
@@ -23,6 +24,7 @@ export const createMainWindow = (): BrowserWindow => {
   registerWindowHandlers(win);
   registerImageHandlers(win);
   registerThumbnailHandler();
+  registerSettingsHandlers();
 
   if (VITE_DEV_SERVER_URL) {
     win.loadURL(VITE_DEV_SERVER_URL);

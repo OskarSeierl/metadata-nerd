@@ -1,7 +1,7 @@
 import { ipcRenderer, IpcRendererEvent } from 'electron';
-import {ProgressUpdate} from "../../shared/types/electron-api.ts";
+import {ApiResponse, ProgressUpdate} from "../../shared/types/electron-api.ts";
 
-export const selectFolder = async (): Promise<string | null> => {
+export const selectFolder = async (): Promise<ApiResponse<string>> => {
   return ipcRenderer.invoke('select-folder');
 };
 

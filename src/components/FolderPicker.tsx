@@ -6,6 +6,7 @@ import {Alert, AlertTitle, AlertDescription} from '@/components/ui/alert.tsx';
 import {FolderOpenIcon, CheckListIcon, AlertCircleIcon} from '@hugeicons/core-free-icons';
 import {HugeiconsIcon} from '@hugeicons/react';
 import {Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle} from "@/components/ui/item.tsx";
+import {parseResponse} from "@/lib/response-parser.ts";
 
 export interface FolderPickerProps {
   selectedFolder: string | null;
@@ -22,9 +23,9 @@ export function FolderPicker({selectedFolder, includeSubfolders, onFolderSelect,
     setIsLoading(true);
     setError(null);
     try {
-      const folderPath = await window.electron?.file?.selectFolder?.();
+      const folderPath = await parseResponse(window.electron.file.selectFolder());
       if (folderPath) {
-        onFolderSelect?.(folderPath);
+        onFolderSelect(folderPath);
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to select folder';
