@@ -5,15 +5,16 @@ import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from "@/components
 
 interface EditorProps {
   images: Image[];
+  onCloseFolder: () => void;
 }
 
-export function Editor({images}: EditorProps) {
+export function Editor({images, onCloseFolder}: EditorProps) {
   const [selectedImages, setSelectedImages] = useState<Image[]>([]);
 
   return (
     <ResizablePanelGroup>
       <ResizablePanel defaultSize="75%" minSize="600px">
-        <ImageLibrary images={images} onSelectedChange={setSelectedImages}/>
+        <ImageLibrary images={images} onSelectedChange={setSelectedImages} onCloseFolder={onCloseFolder} />
       </ResizablePanel>
       <ResizableHandle withHandle/>
       <ResizablePanel defaultSize="25%">

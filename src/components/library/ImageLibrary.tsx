@@ -8,9 +8,10 @@ import {ImageFilter, SortDirection, SortKey, ViewMode} from "@/types/image-libra
 interface ImageLibraryProps {
   images: Image[];
   onSelectedChange: (selectedImageIds: Image[]) => void;
+  onCloseFolder: () => void;
 }
 
-export function ImageLibrary({images, onSelectedChange}: ImageLibraryProps) {
+export function ImageLibrary({images, onSelectedChange, onCloseFolder}: ImageLibraryProps) {
   const [selectedImages, setSelectedImages] = useState<Set<Image>>(new Set());
 
   const [loadedThumbnails, setLoadedThumbnails] = useState<Set<string>>(new Set());
@@ -92,6 +93,7 @@ export function ImageLibrary({images, onSelectedChange}: ImageLibraryProps) {
         onFiltersChange={setFilters}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
+        onCloseFolder={onCloseFolder}
       />
 
       <div className="flex-1 overflow-auto p-4 pt-0">

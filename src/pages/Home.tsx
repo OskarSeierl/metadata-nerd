@@ -43,6 +43,12 @@ export function Home() {
     setIsLoading(false);
   };
 
+  const handleCloseFolder = () => {
+    setSelectedFolderPath(null);
+    setImageFiles([]);
+    setScanProgress(null);
+  }
+
   if (!isLoading && imageFiles.length === 0) {
     return <GettingStarted folderPickerProps={folderPickerProps} onStartClick={handleStartClick}/>;
   }
@@ -51,5 +57,5 @@ export function Home() {
     return <ScanLoading progress={scanProgress} />
   }
 
-  return <Editor images={imageFiles} />
+  return <Editor images={imageFiles} onCloseFolder={handleCloseFolder} />
 }
