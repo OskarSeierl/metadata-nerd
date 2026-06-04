@@ -2,6 +2,8 @@ import {Image} from "../../shared/types/image.ts";
 import {ImageLibrary} from "@/components/library/ImageLibrary.tsx";
 import {useState} from "react";
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from "@/components/ui/resizable.tsx";
+import {MetadataEditor} from "@/components/MetadataEditor.tsx";
+import {FilenameEditor} from "@/components/FilenameEditor.tsx";
 
 interface EditorProps {
   images: Image[];
@@ -18,9 +20,15 @@ export function Editor({images, onCloseFolder}: EditorProps) {
       </ResizablePanel>
       <ResizableHandle withHandle/>
       <ResizablePanel defaultSize="25%">
-        <div className="flex h-full items-center justify-center p-6">
-          <span className="font-semibold">Content</span>
-        </div>
+        <ResizablePanelGroup orientation="vertical">
+          <ResizablePanel defaultSize="70%">
+            <MetadataEditor images={selectedImages} />
+          </ResizablePanel>
+          <ResizableHandle withHandle />
+          <ResizablePanel defaultSize="30%">
+            <FilenameEditor images={selectedImages} />
+          </ResizablePanel>
+        </ResizablePanelGroup>
       </ResizablePanel>
     </ResizablePanelGroup>
   );

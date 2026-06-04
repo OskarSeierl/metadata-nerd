@@ -1,7 +1,7 @@
 import {FolderPicker, FolderPickerProps} from "@/components/FolderPicker.tsx";
 import {DatabaseSync01Icon, File01Icon, Analytics01Icon} from "@hugeicons/core-free-icons";
 import {HugeiconsIcon} from "@hugeicons/react";
-import {TypographyH1} from "@/components/ui/typographyH1.tsx";
+import {TypographyH1} from "@/components/ui/typography/typographyH1.tsx";
 import {Button} from "@/components/ui/button.tsx";
 
 import {Spinner} from "@/components/ui/spinner.tsx";

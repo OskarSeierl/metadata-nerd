@@ -10,6 +10,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import {ImageFilter, ViewMode} from "@/types/image-library.ts";
 import {Button} from "@/components/ui/button.tsx";
+import {TypographyLarge} from "@/components/ui/typography/typographyLarge.tsx";
 
 interface ImageLibraryToolbarProps {
   selectedCount: number;
@@ -40,9 +41,9 @@ export const ImageLibraryToolbar = memo(function ImageLibraryToolbar({
             checked={selectedCount === totalCount && totalCount > 0}
             onCheckedChange={onToggleSelectAll}
           />
-          <span className="font-medium">
-            {selectedCount}/{totalCount} ausgewählt
-          </span>
+          <TypographyLarge>
+            {selectedCount}/{totalCount} selected
+          </TypographyLarge>
         </div>
 
         <ToggleGroup type="multiple" value={filters} onValueChange={onFiltersChange} className="border rounded-md px-1">

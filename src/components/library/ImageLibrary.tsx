@@ -96,26 +96,26 @@ export function ImageLibrary({images, onSelectedChange, onCloseFolder}: ImageLib
         onCloseFolder={onCloseFolder}
       />
 
-      <div className="flex-1 overflow-auto p-4 pt-0">
-        {viewMode === 'grid' ? (
-          <ImageLibraryCards
-            images={processedImages}
-            selectedImages={selectedImages}
-            loadedThumbnails={loadedThumbnails}
-            onToggleImage={handleToggleImage}
-            sortConfig={sortConfig}
-            onSortChange={handleSortChange}
-          />
-        ) : (
-          <ImageLibraryTable
-            images={processedImages}
-            selectedImages={selectedImages}
-            sortConfig={sortConfig}
-            onSort={handleSortChange}
-            onToggleImage={handleToggleImage}
-          />
-        )}
-      </div>
+        <div className="flex-1 p-4 pt-0">
+          {viewMode === 'grid' ? (
+            <ImageLibraryCards
+              images={processedImages}
+              selectedImages={selectedImages}
+              loadedThumbnails={loadedThumbnails}
+              onToggleImage={handleToggleImage}
+              sortConfig={sortConfig}
+              onSortChange={handleSortChange}
+            />
+          ) : (
+            <ImageLibraryTable
+              images={processedImages}
+              selectedImages={selectedImages}
+              sortConfig={sortConfig}
+              onSort={handleSortChange}
+              onToggleImage={handleToggleImage}
+            />
+          )}
+        </div>
     </div>
   );
 }
