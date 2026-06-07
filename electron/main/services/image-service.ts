@@ -1,66 +1,21 @@
-import crypto from 'node:crypto';
 import path from 'node:path';
-import { promises as fs } from 'fs';
+import {promises as fs} from 'fs';
 import exifr from 'exifr';
-import { ALLOWED_IMAGE_EXTENSIONS } from '../../../shared/constants/allowed-image-extensions.ts';
-import { Image, ImageMetadata } from '../../../shared/types/image.ts';
-import { getCachedImage, saveCachedImage } from './database-service.ts';
+import {ALLOWED_IMAGE_EXTENSIONS} from '../../../shared/constants/allowed-image-extensions.ts';
+import {Image, ImageMetadata} from '../../../shared/types/image.ts';
+import {sqlLiteImageCache} from "../constants/cache.ts";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const toImageMetadata = (exifData: any): ImageMetadata | null => {
   if (!exifData) {
     return null;
   }
 
   return {
-    make: exifData.Make,
-    model: exifData.Model,
-    lensModel: exifData.LensModel,
-    iso: exifData.ISO,
-    focalLength: exifData.FocalLength,
-    focalLengthEquivalent: exifData.FocalLengthIn35mmFormat,
-    exposureTime: exifData.ExposureTime,
-    aperture: exifData.FNumber,
-    brightnessValue: exifData.BrightnessValue,
-    exposureProgram: exifData.ExposureProgram,
-    meteringMode: exifData.MeteringMode,
-    flash: exifData.Flash,
-    flashFired: exifData.Flash !== undefined,
-    whiteBalance: exifData.WhiteBalance,
-    dateTimeOriginal: exifData.DateTimeOriginal?.toISOString?.() || exifData.DateTimeOriginal,
-    dateTimeDigitized: exifData.DateTimeDigitized?.toISOString?.() || exifData.DateTimeDigitized,
-    dateTime: exifData.DateTime?.toISOString?.() || exifData.DateTime,
-    subsecTimeOriginal: exifData.SubsecTimeOriginal,
-    imageWidth: exifData.ImageWidth,
-    imageHeight: exifData.ImageHeight,
-    xResolution: exifData.XResolution,
-    yResolution: exifData.YResolution,
-    resolutionUnit: exifData.ResolutionUnit,
-    orientation: exifData.Orientation,
-    colorSpace: exifData.ColorSpace,
-    pixelXDimension: exifData.PixelXDimension,
-    pixelYDimension: exifData.PixelYDimension,
+    ...exifData, // Include all other EXIF fields as well
+    dateTimeOriginal: exifData.DateTimeOriginal,
     gpsLatitude: exifData.latitude,
     gpsLongitude: exifData.longitude,
-    gpsAltitude: exifData.altitude,
-    gpsAltitudeRef: exifData.GPSAltitudeRef,
-    gpsDateStamp: exifData.GPSDateStamp,
-    gpsVersionId: exifData.GPSVersionID,
-    gpsMapDatum: exifData.GPSMapDatum,
-    artist: exifData.Artist,
-    copyright: exifData.Copyright,
-    imageDescription: exifData.ImageDescription,
-    software: exifData.Software,
-    serialNumber: exifData.SerialNumber,
-    userComment: exifData.UserComment,
-    exposureMode: exifData.ExposureMode,
-    exposureBiasValue: exifData.ExposureBiasValue,
-    lightSource: exifData.LightSource,
-    subjectDistance: exifData.SubjectDistance,
-    focusMode: exifData.FocusMode,
-    sceneCaptureType: exifData.SceneCaptureType,
-    contrast: exifData.Contrast,
-    saturation: exifData.Saturation,
-    sharpness: exifData.Sharpness,
   };
 }
 
@@ -73,7 +28,7 @@ export const readImageFilesRecursive = async (
 
   async function walk(currentPath: string) {
     try {
-      const entries = await fs.readdir(currentPath, { withFileTypes: true });
+      const entries = await fs.readdir(currentPath, {withFileTypes: true});
 
       for (const entry of entries) {
         const fullPath = path.join(currentPath, entry.name);
@@ -106,15 +61,13 @@ export const readImageFilesRecursive = async (
     const chunk = imagePaths.slice(i, i + CHUNK_SIZE);
 
     const chunkPromises = chunk.map(async (filePath) => {
-      const id = crypto.createHash('md5').update(filePath).digest('hex');
-
       try {
         const stats = await fs.stat(filePath);
         const mtime = Math.floor(stats.mtimeMs / 1000);
 
-        const cached = getCachedImage(filePath, mtime);
+        const cached = sqlLiteImageCache.getCachedImage(filePath, mtime);
         if (cached) {
-          return { ...cached, fromCache: true } as Image;
+          return {...cached, fromCache: true} as Image;
         }
 
         const exifData = await exifr.parse(filePath, {
@@ -125,7 +78,7 @@ export const readImageFilesRecursive = async (
 
         const metadata = toImageMetadata(exifData);
 
-        saveCachedImage(id, filePath, path.basename(filePath), metadata, mtime);
+        const id = sqlLiteImageCache.saveCachedImage(filePath, path.basename(filePath), metadata, mtime);
 
         return {
           id,
@@ -136,10 +89,9 @@ export const readImageFilesRecursive = async (
           cachedAt: Math.floor(Date.now() / 1000),
           fromCache: false,
         } as Image;
-      } catch (error) {
-        const fallbackId = crypto.createHash('md5').update(filePath).digest('hex');
+      } catch {
         return {
-          id: fallbackId,
+          id: 0,
           fullPath: filePath,
           filename: path.basename(filePath),
           metadata: null,
@@ -161,4 +113,3 @@ export const readImageFilesRecursive = async (
 
   return results;
 };
-

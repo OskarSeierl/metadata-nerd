@@ -66,7 +66,7 @@ export function ImageLibrary({images, onSelectedChange, onCloseFolder}: ImageLib
 
   // --- Data Pipeline ---
   const processedImages = useMemo(() => {
-    let result = images.filter(img => {
+    const result = images.filter(img => {
       if (filters.includes(ImageFilter.NO_LOCATION) && img.metadata?.gpsLatitude) return false;
       if (filters.includes(ImageFilter.NO_TIME) && img.metadata?.dateTimeOriginal) return false;
       return true;

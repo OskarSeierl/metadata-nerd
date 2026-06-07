@@ -15,7 +15,7 @@ export const createMainWindow = (): BrowserWindow => {
       preload: path.join(currentDir, 'preload.mjs'),
     },
     width: 1400,
-    height: 900,
+    height: 1000,
     minWidth: 1024,
     minHeight: 768,
   });

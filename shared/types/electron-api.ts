@@ -12,6 +12,9 @@ export interface ElectronAPI {
     onScanProgress: (callback: (data: ProgressUpdate) => void) => () => void;
     onThumbnailReady: (callback: (id: string) => void) => () => void;
   },
+  editor: {
+    renameImages: (pattern: string, images: Image[]) => Promise<ApiResponse<void>>;
+  },
   settings: {
     deleteCache: () => Promise<ApiResponse<void>>;
   }

@@ -1,12 +1,12 @@
 import {ipcMain} from "electron";
-import {clearAllData} from "../services/database-service.ts";
 import {clearThumbnails} from "../services/thumbnail-service.ts";
 import {ApiResponse} from "../../../shared/types/electron-api.ts";
+import {sqlLiteImageCache} from "../constants/cache.ts";
 
 export const registerSettingsHandlers = () => {
   ipcMain.handle('delete-cache', async (): Promise<ApiResponse> => {
     try {
-      clearAllData();
+      sqlLiteImageCache.clearAllData();
       await clearThumbnails();
       return { success: true, message: 'Cache cleared successfully' };
     } catch (error) {

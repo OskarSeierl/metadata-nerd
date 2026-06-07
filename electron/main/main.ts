@@ -1,10 +1,10 @@
-import { app, BrowserWindow } from 'electron';
+import {app, BrowserWindow} from 'electron';
 import {createMainWindow} from "./main-window.ts";
-import {initializeDatabase, closeDatabase} from './services/database-service.ts';
 import {initializeThumbnailDir} from "./services/thumbnail-service.ts";
+import {sqlLiteImageCache} from "./constants/cache.ts";
 
 // Globale Referenz, um Garbage Collection zu verhindern
-// @ts-ignore
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 let mainWindow: BrowserWindow | null = null;
 
 app.disableHardwareAcceleration();
@@ -19,7 +19,7 @@ process.on('uncaughtException', (error) => {
 
 app.whenReady()
   .then(async () => {
-    initializeDatabase();
+    sqlLiteImageCache.initialize();
     await initializeThumbnailDir();
     mainWindow = createMainWindow();
   })
@@ -30,7 +30,7 @@ app.whenReady()
 // Mac behavior: App continues to run even when all windows are closed
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    closeDatabase();
+    sqlLiteImageCache.close();
     app.quit();
     mainWindow = null;
   }

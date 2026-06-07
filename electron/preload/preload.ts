@@ -1,7 +1,7 @@
 import { contextBridge } from 'electron';
 import {ElectronAPI} from "../../shared/types/electron-api.ts";
 import {closeWindow, maximizeWindow, minimizeWindow} from "./window.ts";
-import {selectFolder, readImageFiles, onScanProgress, onThumbnailReady} from "./image.ts";
+import {selectFolder, readImageFiles, onScanProgress, onThumbnailReady, renameImages} from "./image.ts";
 import {deleteCache} from "./settings.ts";
 
 const api: ElectronAPI = {
@@ -15,6 +15,9 @@ const api: ElectronAPI = {
     readImageFiles,
     onScanProgress,
     onThumbnailReady,
+  },
+  editor: {
+    renameImages
   },
   settings: {
     deleteCache

@@ -58,10 +58,10 @@ export async function generateAndStoreThumbnail(
 
     if (!thumbData) {
       try {
-        thumbData = await sharp(filePath)
+        thumbData = await sharp(filePath, { failOn: "none" })
           .resize({
-            width: 300,
-            height: 300,
+            width: 256,
+            height: 256,
             fit: 'inside',
             withoutEnlargement: true,
           })
@@ -91,7 +91,7 @@ export async function generateAndStoreThumbnail(
 export const processThumbnailsInBackground = async (images: Image[], sender: Electron.WebContents) => {
   for (const img of images) {
     try {
-      const success = await generateAndStoreThumbnail(img.fullPath, img.id);
+      const success = await generateAndStoreThumbnail(img.fullPath, img.id.toString());
       if (success) {
         sender.send('thumbnail-ready', img.id);
       }

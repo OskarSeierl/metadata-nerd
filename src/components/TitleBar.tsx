@@ -25,7 +25,7 @@ export function TitleBar() {
         </Button>
         <div className="flex items-center gap-0.5">
           <Button
-            onClick={window.electron.window.minimize}
+            onClick={() => window.electron.window.minimize()}
             variant="ghost"
             size="icon-sm"
             title="Minimize"
@@ -34,7 +34,7 @@ export function TitleBar() {
           </Button>
 
           <Button
-            onClick={window.electron.window.maximize}
+            onClick={() => window.electron.window.maximize()}
             variant="ghost"
             size="icon-sm"
             title="Maximize"
@@ -43,7 +43,7 @@ export function TitleBar() {
           </Button>
 
           <Button
-            onClick={window.electron.window.close}
+            onClick={() => window.electron.window.close()}
             variant="destructive"
             size="icon-sm"
             title="Close"

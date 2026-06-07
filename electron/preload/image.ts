@@ -1,5 +1,6 @@
 import { ipcRenderer, IpcRendererEvent } from 'electron';
 import {ApiResponse, ProgressUpdate} from "../../shared/types/electron-api.ts";
+import {Image} from "../../shared/types/image.ts";
 
 export const selectFolder = async (): Promise<ApiResponse<string>> => {
   return ipcRenderer.invoke('select-folder');
@@ -15,11 +16,14 @@ export const onScanProgress = (callback: (data: ProgressUpdate) => void) => {
   };
   ipcRenderer.on('read-image-files-progress', listener);
   return () => ipcRenderer.removeListener('read-image-files-progress', listener);
-}
+};
 
 export const onThumbnailReady = (callback: (id: string) => void) => {
   const listener = (_event: IpcRendererEvent, id: string) => callback(id);
   ipcRenderer.on('thumbnail-ready', listener);
   return () => ipcRenderer.removeListener('thumbnail-ready', listener);
-}
+};
 
+export const renameImages = async (pattern: string, images: Image[]) => {
+  return ipcRenderer.invoke('rename-images', pattern, images);
+};
