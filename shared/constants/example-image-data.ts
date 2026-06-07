@@ -1,7 +1,7 @@
 import { Image } from "../types/image.ts";
 
 export const exampleImageData: Image = {
-  id: 'b23bffe6b1bcca6eb6b6ebff1a33f5bb',
+  id: 0,
   fullPath: 'C:\\Users\\Oskar\\Documents\\Fujifilm_FinePix6900ZOOM.jpg',
   filename: 'Fujifilm_FinePix6900ZOOM.jpg',
   metadata: {

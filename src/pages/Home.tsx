@@ -38,7 +38,7 @@ export function Home() {
     setIsLoading(true);
     const result = await parseResponse(window.electron.file.readImageFiles(selectedFolderPath, includeSubfolders));
     if (result) {
-      setImageFiles(result.images);
+      setImageFiles(result);
     }
     setIsLoading(false);
   };
@@ -47,7 +47,16 @@ export function Home() {
     setSelectedFolderPath(null);
     setImageFiles([]);
     setScanProgress(null);
-  }
+  };
+
+  const handleImagesChange = (updatedImages: Image[]) => {
+    setImageFiles((prevImages) =>
+      prevImages.map((img) => {
+        const updatedMatch = updatedImages.find(u => u.id === img.id);
+        return updatedMatch ? updatedMatch : img;
+      })
+    );
+  };
 
   if (!isLoading && imageFiles.length === 0) {
     return <GettingStarted folderPickerProps={folderPickerProps} onStartClick={handleStartClick}/>;
@@ -57,5 +66,9 @@ export function Home() {
     return <ScanLoading progress={scanProgress} />
   }
 
-  return <Editor images={imageFiles} onCloseFolder={handleCloseFolder} />
+  return <Editor
+    images={imageFiles}
+    onImagesChange={handleImagesChange}
+    onCloseFolder={handleCloseFolder}
+  />
 }

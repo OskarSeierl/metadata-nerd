@@ -7,10 +7,11 @@ import {FilenameEditor} from "@/components/FilenameEditor.tsx";
 
 interface EditorProps {
   images: Image[];
+  onImagesChange: (changedImages: Image[]) => void;
   onCloseFolder: () => void;
 }
 
-export function Editor({images, onCloseFolder}: EditorProps) {
+export function Editor({images, onImagesChange, onCloseFolder}: EditorProps) {
   const [selectedImages, setSelectedImages] = useState<Image[]>([]);
 
   return (
@@ -26,7 +27,7 @@ export function Editor({images, onCloseFolder}: EditorProps) {
           </ResizablePanel>
           <ResizableHandle withHandle />
           <ResizablePanel defaultSize="30%">
-            <FilenameEditor images={selectedImages} />
+            <FilenameEditor images={selectedImages} onFinish={onImagesChange} />
           </ResizablePanel>
         </ResizablePanelGroup>
       </ResizablePanel>

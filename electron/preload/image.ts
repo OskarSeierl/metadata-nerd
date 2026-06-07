@@ -24,6 +24,6 @@ export const onThumbnailReady = (callback: (id: string) => void) => {
   return () => ipcRenderer.removeListener('thumbnail-ready', listener);
 };
 
-export const renameImages = async (pattern: string, images: Image[]) => {
+export const renameImages = async (pattern: string, images: Image[]): Promise<ApiResponse<Image[]>> => {
   return ipcRenderer.invoke('rename-images', pattern, images);
 };

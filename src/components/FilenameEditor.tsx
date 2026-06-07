@@ -24,6 +24,7 @@ import {Spinner} from "@/components/ui/spinner.tsx";
 
 interface FilenameEditorProps {
   images: Image[];
+  onFinish: (changedImages: Image[]) => void;
 }
 
 const formSchema = z.object({
@@ -38,7 +39,7 @@ const formSchema = z.object({
     ),
 });
 
-export function FilenameEditor({images}: FilenameEditorProps) {
+export function FilenameEditor({images, onFinish}: FilenameEditorProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -55,7 +56,10 @@ export function FilenameEditor({images}: FilenameEditorProps) {
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsLoading(true);
-    await parseResponse(window.electron.editor.renameImages(data.pattern, images));
+    const changedImages = await parseResponse(window.electron.editor.renameImages(data.pattern, images));
+    if(changedImages) {
+      onFinish(changedImages);
+    }
     setIsLoading(false);
   };
 

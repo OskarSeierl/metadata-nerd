@@ -1,5 +1,5 @@
 import {BrowserWindow, dialog, ipcMain} from 'electron';
-import {ApiResponse, ReadImageFilesResult} from "../../../shared/types/electron-api.ts";
+import {ApiResponse} from "../../../shared/types/electron-api.ts";
 import {readImageFilesRecursive} from '../services/image-service.ts';
 import {processThumbnailsInBackground} from '../services/thumbnail-service.ts';
 import {Image} from "../../../shared/types/image.ts";
@@ -18,7 +18,7 @@ export function registerImageHandlers(mainWindow: BrowserWindow) {
     return {success: true, message: 'Folder selected successfully', data: result.filePaths[0]};
   });
 
-  ipcMain.handle('read-image-files', async (event, folderPath: string, includeSubfolders: boolean): Promise<ApiResponse<ReadImageFilesResult>> => {
+  ipcMain.handle('read-image-files', async (event, folderPath: string, includeSubfolders: boolean): Promise<ApiResponse<Image[]>> => {
     if (!folderPath) {
       return {success: false, message: 'Folder path is required'};
     }
@@ -36,19 +36,17 @@ export function registerImageHandlers(mainWindow: BrowserWindow) {
     return {
       success: true,
       message: `Found ${imageFiles.length} image files`,
-      data: {
-        count: imageFiles.length,
-        images: imageFiles,
-      }
+      data: imageFiles
     };
   });
 
-  ipcMain.handle('rename-images', async (_event, pattern: string, images: Image[]): Promise<ApiResponse<void>> => {
+  ipcMain.handle('rename-images', async (_event, pattern: string, images: Image[]): Promise<ApiResponse<Image[]>> => {
     try {
-      await renameImages(pattern, images);
+      const renamedImages = await renameImages(pattern, images);
       return {
         success: true,
         message: `Renamed ${images.length} images successfully`,
+        data: renamedImages
       };
     } catch (e) {
       console.log(e)

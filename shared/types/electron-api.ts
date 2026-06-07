@@ -8,12 +8,12 @@ export interface ElectronAPI {
   };
   file: {
     selectFolder: () => Promise<ApiResponse<string>>;
-    readImageFiles: (folderPath: string, includeSubfolders: boolean) => Promise<ApiResponse<ReadImageFilesResult>>;
+    readImageFiles: (folderPath: string, includeSubfolders: boolean) => Promise<ApiResponse<Image[]>>;
     onScanProgress: (callback: (data: ProgressUpdate) => void) => () => void;
     onThumbnailReady: (callback: (id: string) => void) => () => void;
   },
   editor: {
-    renameImages: (pattern: string, images: Image[]) => Promise<ApiResponse<void>>;
+    renameImages: (pattern: string, images: Image[]) => Promise<ApiResponse<Image[]>>;
   },
   settings: {
     deleteCache: () => Promise<ApiResponse<void>>;
@@ -29,9 +29,4 @@ export interface ApiResponse<T = undefined> {
 export interface ProgressUpdate {
   current: number;
   total: number;
-}
-
-export interface ReadImageFilesResult {
-  count: number;
-  images: Image[];
 }
