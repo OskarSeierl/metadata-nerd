@@ -1,4 +1,4 @@
-import {Image} from "../../shared/types/image.ts";
+import {Image} from "../../../../shared/types/image.ts";
 import {TypographyLarge} from "@/components/ui/typography/typographyLarge.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {
@@ -13,14 +13,14 @@ import {zodResolver} from "@hookform/resolvers/zod"
 import * as z from "zod"
 import {Button} from "@/components/ui/button.tsx";
 import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip.tsx";
-import {patternPlaceholders} from "../../shared/constants/file-name-placeholders.ts";
-import {FilenamePatternPlaceholders} from "../../shared/types/file-name.ts";
-import {FilenamePlaceholderInfoDialog} from "@/components/FilenamePlaceholderInfoDialog.tsx";
+import {patternPlaceholders} from "../../../../shared/constants/file-name-placeholders.ts";
+import {FilenamePatternPlaceholders} from "../../../../shared/types/file-name.ts";
+import {FilenamePlaceholderInfoDialog} from "@/components/editor/filename/FilenamePlaceholderInfoDialog.tsx";
 import {parseResponse} from "@/lib/response-parser.ts";
-import {replacePlaceholdersInPattern} from "../../shared/utils/file.ts";
-import {exampleImageData} from "../../shared/constants/example-image-data.ts";
+import {replacePlaceholdersInPattern} from "../../../../shared/utils/file.ts";
+import {exampleImageData} from "../../../../shared/constants/example-image-data.ts";
 import {useMemo, useState} from "react";
-import {Spinner} from "@/components/ui/spinner.tsx";
+import {ProtectedRenameConfirm} from "@/components/editor/filename/ProtectedRenameConfirm.tsx";
 
 interface FilenameEditorProps {
   images: Image[];
@@ -71,7 +71,7 @@ export function FilenameEditor({images, onFinish}: FilenameEditorProps) {
   return (
     <div className="space-y-3 px-3 pt-3">
       <TypographyLarge>Filename</TypographyLarge>
-      <form id="filename-editor-form" onSubmit={form.handleSubmit(onSubmit)}>
+      <form id="filename-editor-form">
         <FieldGroup>
           <Controller
             name="pattern"
@@ -128,12 +128,12 @@ export function FilenameEditor({images, onFinish}: FilenameEditorProps) {
           </Field>
 
           <Field>
-            <Button type="submit" disabled={images.length === 0 || isLoading}>
-              {isLoading && (
-                <Spinner data-icon="inline-start"/>
-              )}
-              Rename {images.length} {images.length === 1 ? "file" : "files"}
-            </Button>
+            <ProtectedRenameConfirm
+              isLoading={isLoading}
+              onConfirm={form.handleSubmit(onSubmit)}
+              selectedImages={images}
+              pattern={form.getValues("pattern")}
+            />
           </Field>
         </FieldGroup>
       </form>

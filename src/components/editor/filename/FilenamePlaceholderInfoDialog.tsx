@@ -1,5 +1,5 @@
 import {HugeiconsIcon} from '@hugeicons/react';
-import {Button} from './ui/button';
+import {Button} from '../../ui/button.tsx';
 import {
   Dialog,
   DialogTrigger,
