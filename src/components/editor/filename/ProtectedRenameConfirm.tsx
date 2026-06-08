@@ -10,19 +10,34 @@ import {Field, FieldDescription, FieldLabel} from "@/components/ui/field.tsx";
 import {replacePlaceholdersInPattern} from "../../../../shared/utils/file.ts";
 import {Spinner} from "@/components/ui/spinner.tsx";
 import {Button} from "@/components/ui/button.tsx";
+import {useState, MouseEvent} from "react";
+import {parseResponse} from "@/lib/response-parser.ts";
 
 interface ProtectedRenameConfirmProps {
-  isLoading: boolean;
   selectedImages: Image[];
   pattern: string;
-  onConfirm: () => void;
+  onFinish: (changedImages: Image[]) => void;
 }
 
-export function ProtectedRenameConfirm({isLoading, selectedImages, pattern, onConfirm}: ProtectedRenameConfirmProps) {
+export function ProtectedRenameConfirm({selectedImages, pattern, onFinish}: ProtectedRenameConfirmProps) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [isOpen, setIsOpen] = useState(false); // <-- 1. Add this
+
   const exampleCount = Math.min(5, selectedImages.length);
 
+  const handleConfirmClick = async (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+    const changedImages = await parseResponse(window.electron.editor.renameImages(pattern, selectedImages));
+    if(changedImages) {
+      onFinish(changedImages);
+    }
+    setIsLoading(false);
+    setIsOpen(false);
+  };
+
   return (
-    <AlertDialog>
+    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogTrigger asChild>
         <Button type="button" disabled={selectedImages.length === 0 || isLoading}>
           Rename {selectedImages.length} {selectedImages.length === 1 ? "file" : "files"}
@@ -57,7 +72,7 @@ export function ProtectedRenameConfirm({isLoading, selectedImages, pattern, onCo
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={() => onConfirm()}>
+          <AlertDialogAction onClick={(e) => handleConfirmClick(e)}>
             {
               isLoading ? (
                 <>

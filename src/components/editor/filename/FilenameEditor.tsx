@@ -16,10 +16,9 @@ import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip.t
 import {patternPlaceholders} from "../../../../shared/constants/file-name-placeholders.ts";
 import {FilenamePatternPlaceholders} from "../../../../shared/types/file-name.ts";
 import {FilenamePlaceholderInfoDialog} from "@/components/editor/filename/FilenamePlaceholderInfoDialog.tsx";
-import {parseResponse} from "@/lib/response-parser.ts";
 import {replacePlaceholdersInPattern} from "../../../../shared/utils/file.ts";
 import {exampleImageData} from "../../../../shared/constants/example-image-data.ts";
-import {useMemo, useState} from "react";
+import {useMemo} from "react";
 import {ProtectedRenameConfirm} from "@/components/editor/filename/ProtectedRenameConfirm.tsx";
 
 interface FilenameEditorProps {
@@ -27,7 +26,7 @@ interface FilenameEditorProps {
   onFinish: (changedImages: Image[]) => void;
 }
 
-const formSchema = z.object({
+export const editFilenameFormSchema = z.object({
   pattern: z
     .string()
     .trim()
@@ -40,28 +39,18 @@ const formSchema = z.object({
 });
 
 export function FilenameEditor({images, onFinish}: FilenameEditorProps) {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof editFilenameFormSchema>>({
+    resolver: zodResolver(editFilenameFormSchema),
     defaultValues: {
       pattern: "<YYYY>-<MM>-<DD>_image",
     },
   });
 
-  const [isLoading, setIsLoading] = useState(false);
 
   const currentPattern = form.watch("pattern");
   const exampleOutput = useMemo(() => {
     return replacePlaceholdersInPattern(currentPattern, 0, exampleImageData);
   }, [currentPattern]);
-
-  const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    setIsLoading(true);
-    const changedImages = await parseResponse(window.electron.editor.renameImages(data.pattern, images));
-    if(changedImages) {
-      onFinish(changedImages);
-    }
-    setIsLoading(false);
-  };
 
   const insertPlaceholder = (placeholder: keyof FilenamePatternPlaceholders) => {
     const current = form.getValues("pattern")
@@ -129,10 +118,9 @@ export function FilenameEditor({images, onFinish}: FilenameEditorProps) {
 
           <Field>
             <ProtectedRenameConfirm
-              isLoading={isLoading}
-              onConfirm={form.handleSubmit(onSubmit)}
               selectedImages={images}
               pattern={form.getValues("pattern")}
+              onFinish={onFinish}
             />
           </Field>
         </FieldGroup>
