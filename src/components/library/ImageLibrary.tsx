@@ -7,13 +7,13 @@ import {ImageFilter, SortDirection, SortKey, ViewMode} from "@/types/image-libra
 
 interface ImageLibraryProps {
   images: Image[];
-  onSelectedChange: (selectedImageIds: Image[]) => void;
+  selectedImages: Set<Image>;
+  onToggleSelectAll: (checked: boolean) => void;
+  onToggleImage: (image: Image) => void;
   onCloseFolder: () => void;
 }
 
-export function ImageLibrary({images, onSelectedChange, onCloseFolder}: ImageLibraryProps) {
-  const [selectedImages, setSelectedImages] = useState<Set<Image>>(new Set());
-
+export function ImageLibrary({images, selectedImages, onToggleSelectAll, onToggleImage, onCloseFolder}: ImageLibraryProps) {
   const [loadedThumbnails, setLoadedThumbnails] = useState<Set<number>>(new Set());
 
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
@@ -29,30 +29,6 @@ export function ImageLibrary({images, onSelectedChange, onCloseFolder}: ImageLib
       setLoadedThumbnails(current => new Set(current).add(readyId));
     });
     return cleanup;
-  }, []);
-
-  useEffect(() => {
-    onSelectedChange(Array.from(selectedImages));
-  }, [selectedImages, onSelectedChange]);
-
-  const handleToggleSelectAll = useCallback((checked: boolean) => {
-    if (checked) {
-      setSelectedImages(new Set(images));
-    } else {
-      setSelectedImages(new Set());
-    }
-  }, [images]);
-
-  const handleToggleImage = useCallback((image: Image) => {
-    setSelectedImages((prev) => {
-      const newSelected = new Set(prev);
-      if (newSelected.has(image)) {
-        newSelected.delete(image);
-      } else {
-        newSelected.add(image);
-      }
-      return newSelected;
-    });
   }, []);
 
   const handleSortChange = useCallback((key: SortKey, explicitDirection?: SortDirection) => {
@@ -89,7 +65,7 @@ export function ImageLibrary({images, onSelectedChange, onCloseFolder}: ImageLib
       <ImageLibraryToolbar
         selectedCount={selectedImages.size}
         totalCount={processedImages.length}
-        onToggleSelectAll={handleToggleSelectAll}
+        onToggleSelectAll={onToggleSelectAll}
         filters={filters}
         onFiltersChange={setFilters}
         viewMode={viewMode}
@@ -103,7 +79,7 @@ export function ImageLibrary({images, onSelectedChange, onCloseFolder}: ImageLib
             images={processedImages}
             selectedImages={selectedImages}
             loadedThumbnails={loadedThumbnails}
-            onToggleImage={handleToggleImage}
+            onToggleImage={onToggleImage}
             sortConfig={sortConfig}
             onSortChange={handleSortChange}
           />
@@ -113,10 +89,12 @@ export function ImageLibrary({images, onSelectedChange, onCloseFolder}: ImageLib
             selectedImages={selectedImages}
             sortConfig={sortConfig}
             onSort={handleSortChange}
-            onToggleImage={handleToggleImage}
+            onToggleImage={onToggleImage}
           />
         )}
       </div>
     </div>
   );
 }
+
+
