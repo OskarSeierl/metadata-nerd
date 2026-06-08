@@ -14,7 +14,7 @@ interface ImageLibraryProps {
 export function ImageLibrary({images, onSelectedChange, onCloseFolder}: ImageLibraryProps) {
   const [selectedImages, setSelectedImages] = useState<Set<Image>>(new Set());
 
-  const [loadedThumbnails, setLoadedThumbnails] = useState<Set<string>>(new Set());
+  const [loadedThumbnails, setLoadedThumbnails] = useState<Set<number>>(new Set());
 
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
 
@@ -25,7 +25,7 @@ export function ImageLibrary({images, onSelectedChange, onCloseFolder}: ImageLib
   });
 
   useEffect(() => {
-    const cleanup = window.electron?.file?.onThumbnailReady?.((readyId: string) => {
+    const cleanup = window.electron?.file?.onThumbnailReady?.((readyId: number) => {
       setLoadedThumbnails(current => new Set(current).add(readyId));
     });
     return cleanup;
@@ -85,7 +85,7 @@ export function ImageLibrary({images, onSelectedChange, onCloseFolder}: ImageLib
   }, [images, filters, sortConfig]);
 
   return (
-    <div className="flex flex-col h-full space-y-4">
+    <div className="flex flex-col h-full space-y-4 overflow-hidden">
       <ImageLibraryToolbar
         selectedCount={selectedImages.size}
         totalCount={processedImages.length}
@@ -97,26 +97,26 @@ export function ImageLibrary({images, onSelectedChange, onCloseFolder}: ImageLib
         onCloseFolder={onCloseFolder}
       />
 
-        <div className="flex-1 p-4 pt-0 overflow-y-auto">
-          {viewMode === 'grid' ? (
-            <ImageLibraryCards
-              images={processedImages}
-              selectedImages={selectedImages}
-              loadedThumbnails={loadedThumbnails}
-              onToggleImage={handleToggleImage}
-              sortConfig={sortConfig}
-              onSortChange={handleSortChange}
-            />
-          ) : (
-            <ImageLibraryTable
-              images={processedImages}
-              selectedImages={selectedImages}
-              sortConfig={sortConfig}
-              onSort={handleSortChange}
-              onToggleImage={handleToggleImage}
-            />
-          )}
-        </div>
+      <div className="flex-1 p-4 pt-0 min-h-0">
+        {viewMode === 'grid' ? (
+          <ImageLibraryCards
+            images={processedImages}
+            selectedImages={selectedImages}
+            loadedThumbnails={loadedThumbnails}
+            onToggleImage={handleToggleImage}
+            sortConfig={sortConfig}
+            onSortChange={handleSortChange}
+          />
+        ) : (
+          <ImageLibraryTable
+            images={processedImages}
+            selectedImages={selectedImages}
+            sortConfig={sortConfig}
+            onSort={handleSortChange}
+            onToggleImage={handleToggleImage}
+          />
+        )}
+      </div>
     </div>
   );
 }
