@@ -67,9 +67,10 @@ export function ImageLibrary({images, onSelectedChange, onCloseFolder}: ImageLib
   // --- Data Pipeline ---
   const processedImages = useMemo(() => {
     const result = images.filter(img => {
-      if (filters.includes(ImageFilter.NO_LOCATION) && img.metadata?.gpsLatitude) return false;
-      if (filters.includes(ImageFilter.NO_TIME) && img.metadata?.dateTimeOriginal) return false;
-      return true;
+      return !(
+        filters.includes(ImageFilter.NO_LOCATION) && img.metadata?.gpsLatitude
+        || filters.includes(ImageFilter.NO_TIME) && img.metadata?.dateTimeOriginal
+      );
     });
 
     result.sort((a, b) => {
@@ -96,7 +97,7 @@ export function ImageLibrary({images, onSelectedChange, onCloseFolder}: ImageLib
         onCloseFolder={onCloseFolder}
       />
 
-        <div className="flex-1 p-4 pt-0">
+        <div className="flex-1 p-4 pt-0 overflow-y-auto">
           {viewMode === 'grid' ? (
             <ImageLibraryCards
               images={processedImages}

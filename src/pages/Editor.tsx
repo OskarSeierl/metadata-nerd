@@ -2,7 +2,7 @@ import {Image} from "../../shared/types/image.ts";
 import {ImageLibrary} from "@/components/library/ImageLibrary.tsx";
 import {useState} from "react";
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from "@/components/ui/resizable.tsx";
-import {MetadataEditor} from "@/components/editor/MetadataEditor.tsx";
+import {MetadataEditor} from "@/components/editor/metadata/MetadataEditor.tsx";
 import {FilenameEditor} from "@/components/editor/filename/FilenameEditor.tsx";
 
 interface EditorProps {

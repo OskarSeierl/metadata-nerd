@@ -1,4 +1,4 @@
-import {Image} from "../../../shared/types/image.ts";
+import {Image} from "../../../../shared/types/image.ts";
 import {TypographyLarge} from "@/components/ui/typography/typographyLarge.tsx";
 
 interface MetadataEditorProps {
