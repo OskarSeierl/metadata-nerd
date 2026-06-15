@@ -1,8 +1,9 @@
 name: Build and Release
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - 'v*.*.*'
 
 # This is absolutely necessary so the action has permission to upload files to your release
 permissions:
