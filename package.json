@@ -5,14 +5,38 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build && electron-builder",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "build:ui": "vite build",
+    "build": "npm run typecheck && npm run build:ui",
+    "dist": "npm run build && electron-builder --publish always"
   },
   "author": {
     "name": "Oskar Seierl",
     "email": "mail@seierl.net",
     "url": "https://seierl.net"
+  },
+  "build": {
+    "appId": "com.metadata-nerd.app",
+    "productName": "Metadata Nerd",
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "OskarSeierl",
+        "repo": "metadata-nerd"
+      }
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Utility"
+    }
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.2.8",

@@ -1,0 +1,33 @@
+name: Sanity Check
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest # Cheap, fast, and standard
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Verify Lint
+        run: npm run lint
+
+      - name: Verify TypeScript
+        run: npm run typecheck
+
+      - name: Verify Vite Build
+        run: npm run build:ui
