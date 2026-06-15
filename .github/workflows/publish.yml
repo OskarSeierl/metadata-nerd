@@ -28,6 +28,10 @@ jobs:
 
       - name: Install Dependencies
         run: npm ci
+        env:
+          # This forces node-gyp to use VS 2022 on the Windows runner
+          npm_config_msvs_version: 2022
+          GYP_MSVS_VERSION: 2022
 
       - name: Build and Upload Assets
         run: npm run release
