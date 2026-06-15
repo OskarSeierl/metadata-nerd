@@ -30,7 +30,7 @@ jobs:
         run: npm ci
 
       - name: Build and Upload Assets
-        run: npm run dist
+        run: npm run release
         env:
           # This token is automatically provided by GitHub.
           # electron-builder uses it to upload the artifacts to your existing release.

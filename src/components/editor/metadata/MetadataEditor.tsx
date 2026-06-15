@@ -6,6 +6,7 @@ interface MetadataEditorProps {
 }
 
 export function MetadataEditor({images}: MetadataEditorProps) {
+  console.log('MetadataEditor received images:', images);
   return (
     <div className="space-y-3 px-3">
       <TypographyLarge>Metadata</TypographyLarge>

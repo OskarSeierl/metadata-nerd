@@ -9,7 +9,9 @@
     "lint": "eslint .",
     "build:ui": "vite build",
     "build": "npm run typecheck && npm run build:ui",
-    "dist": "npm run build && electron-builder --publish always"
+    "dist:win": "npm run build && electron-builder --win",
+    "release": "npm run build && electron-builder --publish always",
+    "postinstall": "electron-builder install-app-deps"
   },
   "author": {
     "name": "Oskar Seierl",
@@ -19,6 +21,11 @@
   "build": {
     "appId": "com.metadata-nerd.app",
     "productName": "Metadata Nerd",
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*",
+      "package.json"
+    ],
     "publish": [
       {
         "provider": "github",

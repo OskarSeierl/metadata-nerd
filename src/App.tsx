@@ -1,11 +1,11 @@
-import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
+import {HashRouter, Routes, Route} from 'react-router-dom';
 import {Layout} from "./components/Layout.tsx";
 import {Home} from "./pages/Home.tsx";
 import {TooltipProvider} from "@/components/ui/tooltip.tsx";
 
 function App() {
   return (
-    <Router>
+    <HashRouter>
       <TooltipProvider>
         <Routes>
           <Route element={<Layout/>}>
@@ -13,7 +13,7 @@ function App() {
           </Route>
         </Routes>
       </TooltipProvider>
-    </Router>
+    </HashRouter>
   );
 }
 

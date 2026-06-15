@@ -3,10 +3,6 @@ import {createMainWindow} from "./main-window.ts";
 import {initializeThumbnailDir} from "./services/thumbnail-service.ts";
 import {sqlLiteImageCache} from "./constants/cache.ts";
 
-// Globale Referenz, um Garbage Collection zu verhindern
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-let mainWindow: BrowserWindow | null = null;
-
 app.disableHardwareAcceleration();
 
 process.on('unhandledRejection', (reason) => {
@@ -21,7 +17,7 @@ app.whenReady()
   .then(async () => {
     sqlLiteImageCache.initialize();
     await initializeThumbnailDir();
-    mainWindow = createMainWindow();
+    createMainWindow();
   })
   .catch((error) => {
     console.error('Failed to initialize app:', error);
@@ -32,13 +28,12 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     sqlLiteImageCache.close();
     app.quit();
-    mainWindow = null;
   }
 });
 
 // Mac behavior: Recreate windows when the Dock icon is clicked
 app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
-    mainWindow = createMainWindow();
+    createMainWindow();
   }
 });

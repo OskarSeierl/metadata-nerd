@@ -18,8 +18,8 @@ export const onScanProgress = (callback: (data: ProgressUpdate) => void) => {
   return () => ipcRenderer.removeListener('read-image-files-progress', listener);
 };
 
-export const onThumbnailReady = (callback: (id: string) => void) => {
-  const listener = (_event: IpcRendererEvent, id: string) => callback(id);
+export const onThumbnailReady = (callback: (id: number) => void) => {
+  const listener = (_event: IpcRendererEvent, id: number) => callback(id);
   ipcRenderer.on('thumbnail-ready', listener);
   return () => ipcRenderer.removeListener('thumbnail-ready', listener);
 };

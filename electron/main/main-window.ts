@@ -30,7 +30,9 @@ export const createMainWindow = (): BrowserWindow => {
     win.loadURL(VITE_DEV_SERVER_URL);
     win.webContents.openDevTools({ mode: 'detach' });
   } else {
+    console.log(`Loading renderer from: ${path.join(RENDERER_DIST, 'index.html')}`);
     win.loadFile(path.join(RENDERER_DIST, 'index.html'));
+    win.webContents.openDevTools({ mode: 'detach' });
   }
 
   return win;
