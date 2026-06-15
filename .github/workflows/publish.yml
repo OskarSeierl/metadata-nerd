@@ -14,7 +14,7 @@ jobs:
     strategy:
       matrix:
         # Builds across all three OS platforms in parallel
-        os: [windows-2022, ubuntu-latest]
+        os: [windows-latest, ubuntu-latest]
 
     steps:
       - name: Check out Git repository
