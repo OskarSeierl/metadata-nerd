@@ -7,7 +7,7 @@ import {ImageFilter, SortDirection, SortKey, ViewMode} from "@/types/image-libra
 
 interface ImageLibraryProps {
   images: Image[];
-  selectedImages: Set<Image>;
+  selectedImages: Set<number>;
   onToggleSelectAll: (checked: boolean) => void;
   onToggleImage: (image: Image) => void;
   onCloseFolder: () => void;

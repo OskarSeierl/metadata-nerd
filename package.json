@@ -38,14 +38,16 @@
       "target": [
         "nsis"
       ],
-      "icon": "public/icons/favicon-32-32.png"
+      "icon": "public/favicon.png",
+      "artifactName": "Metadata-Nerd-Setup.${ext}"
     },
     "linux": {
       "target": [
         "AppImage"
       ],
       "category": "Utility",
-      "icon": "public/icons/favicon-32-32.png"
+      "icon": "public/favicon.png",
+      "artifactName": "Metadata-Nerd-Setup.${ext}"
     }
   },
   "dependencies": {

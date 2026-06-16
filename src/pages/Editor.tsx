@@ -12,34 +12,34 @@ interface EditorProps {
 }
 
 export function Editor({images, onImagesChange, onCloseFolder}: EditorProps) {
-  const [selectedImages, setSelectedImages] = useState<Set<Image>>(new Set());
+  const [selectedImages, setSelectedImages] = useState<Set<number>>(new Set());
 
-  const selectedImagesArray = useMemo(() => Array.from(selectedImages), [selectedImages]);
+  const selectedImagesArray = useMemo(() => {
+    if (selectedImages.size === 0) return [];
+    return images.filter(img => selectedImages.has(img.id));
+  }, [images, selectedImages]);
+
+  const allImageIds = useMemo(() => new Set(images.map((image) => image.id)), [images]);
 
   const handleToggleSelectAll = useCallback((checked: boolean) => {
     if (checked) {
-      setSelectedImages(new Set(images));
+      setSelectedImages(allImageIds);
     } else {
       setSelectedImages(new Set());
     }
-  }, [images]);
+  }, [allImageIds]);
 
   const handleToggleImage = useCallback((image: Image) => {
     setSelectedImages((prev) => {
       const newSelected = new Set(prev);
-      if (newSelected.has(image)) {
-        newSelected.delete(image);
+      if (newSelected.has(image.id)) {
+        newSelected.delete(image.id);
       } else {
-        newSelected.add(image);
+        newSelected.add(image.id);
       }
       return newSelected;
     });
   }, []);
-
-  const handleImagesChange = useCallback((updatedImages: Image[]) => {
-    onImagesChange(updatedImages);
-    setSelectedImages(new Set());
-  }, [onImagesChange]);
 
   return (
     <ResizablePanelGroup>
@@ -60,7 +60,7 @@ export function Editor({images, onImagesChange, onCloseFolder}: EditorProps) {
           </ResizablePanel>
           <ResizableHandle withHandle />
           <ResizablePanel defaultSize="30%">
-            <FilenameEditor images={selectedImagesArray} onFinish={handleImagesChange} />
+            <FilenameEditor images={selectedImagesArray} onFinish={onImagesChange} />
           </ResizablePanel>
         </ResizablePanelGroup>
       </ResizablePanel>

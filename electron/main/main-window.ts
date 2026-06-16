@@ -8,7 +8,7 @@ import {registerSettingsHandlers} from "./handlers/settings-handler.ts";
 
 export const createMainWindow = (): BrowserWindow => {
   const win = new BrowserWindow({
-    icon: path.join(VITE_PUBLIC, 'icons', 'favicon.png'),
+    icon: path.join(VITE_PUBLIC, 'favicon.png'),
     frame: false,
     titleBarStyle: 'hidden',
     webPreferences: {

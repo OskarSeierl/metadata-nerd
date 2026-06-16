@@ -12,7 +12,7 @@ type SortDirection = 'asc' | 'desc';
 
 interface ImageLibraryTableProps {
   images: Image[];
-  selectedImages: Set<Image>;
+  selectedImages: Set<number>;
   sortConfig: { key: SortKey; direction: SortDirection };
   onSort: (key: SortKey) => void;
   onToggleImage: (image: Image) => void;
@@ -92,7 +92,7 @@ export const ImageLibraryTable = memo(function ImageLibraryTable({
               <ImageTableRow
                 key={img.id}
                 img={img}
-                isSelected={selectedImages.has(img)}
+                isSelected={selectedImages.has(img.id)}
                 onToggle={onToggleImage}
               />
             );

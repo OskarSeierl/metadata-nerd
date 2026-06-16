@@ -15,7 +15,7 @@ type SortDirection = 'asc' | 'desc';
 
 interface ImageLibraryCardsProps {
   images: Image[];
-  selectedImages: Set<Image>;
+  selectedImages: Set<number>;
   loadedThumbnails: Set<number>;
   onToggleImage: (image: Image) => void;
   sortConfig: { key: SortKey; direction: SortDirection };
@@ -111,7 +111,7 @@ export const ImageLibraryCards = memo(function ImageLibraryCards({
                   <ImageCard
                     key={img.id}
                     img={img}
-                    isSelected={selectedImages.has(img)}
+                    isSelected={selectedImages.has(img.id)}
                     loaded={loadedThumbnails.has(img.id)}
                     onToggle={onToggleImage}
                   />
