@@ -42,6 +42,10 @@ To compile the application on a Windows machine, run:
 npm run dist:win
 ```
 
+## 🚢 Creating a Release
+Use the `npm version [major | minor | patch]` command to bump the version number, then push the changes and create a new release on GitHub.
+A corresponding tag is automatically created, which can be pushed by using `git push --follow-tags origin main`.
+
 ## 🤝 Contributing
 Contributions, issues, and feature requests are highly encouraged! Your help is welcome!
 1. Fork the Project 

@@ -38,7 +38,7 @@
       "target": [
         "nsis"
       ],
-      "icon": "public/favicon.png",
+      "icon": "public/favicon-512x512.png",
       "artifactName": "Metadata-Nerd-Setup.${ext}"
     },
     "linux": {
@@ -46,7 +46,7 @@
         "AppImage"
       ],
       "category": "Utility",
-      "icon": "public/favicon.png",
+      "icon": "public/favicon-512x512.png",
       "artifactName": "Metadata-Nerd-Setup.${ext}"
     }
   },
