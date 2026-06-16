@@ -1,4 +1,4 @@
-import {Image} from "./image.ts";
+import {Image, ImageMetadata} from "./image.ts";
 
 export interface ElectronAPI {
   window: {
@@ -14,6 +14,7 @@ export interface ElectronAPI {
   },
   editor: {
     renameImages: (pattern: string, images: Image[]) => Promise<ApiResponse<Image[]>>;
+    editMetadata: (metadata: ImageMetadata, images: Image[]) => Promise<ApiResponse<Image[]>>;
   },
   settings: {
     deleteCache: () => Promise<ApiResponse<void>>;

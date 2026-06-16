@@ -33,3 +33,21 @@ export const formatDate = (date: Date): string => {
 
   return `${year}-${month}-${day}`;
 };
+
+export const formatDateFromString = (dateString: string): string => {
+  const date = parseISODate(dateString);
+  return formatDate(date);
+};
+
+export const formatTime = (date: Date): string => {
+  const hours = getPaddedHourOfDate(date.toISOString());
+  const minutes = getPaddedMinuteOfDate(date.toISOString());
+  const seconds = getPaddedSecondOfDate(date.toISOString());
+
+  return `${hours}:${minutes}:${seconds}`;
+};
+
+export const formatTimeFromString = (dateString: string): string => {
+  const date = parseISODate(dateString);
+  return formatTime(date);
+}

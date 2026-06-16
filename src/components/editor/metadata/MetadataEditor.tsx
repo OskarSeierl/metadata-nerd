@@ -1,4 +1,4 @@
-import {Image} from "../../../../shared/types/image.ts";
+import {Image, ImageMetadata} from "../../../../shared/types/image.ts";
 import {TypographyLarge} from "@/components/ui/typography/typographyLarge.tsx";
 import {Field, FieldDescription, FieldGroup, FieldLegend, FieldSeparator, FieldSet} from "@/components/ui/field.tsx";
 import {useForm} from "react-hook-form";
@@ -13,35 +13,42 @@ import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "@/components/
 import {HugeiconsIcon} from "@hugeicons/react";
 import {ArrowDown01Icon, ArrowUp01Icon} from "@hugeicons/core-free-icons";
 import {DynamicExifFields} from "@/components/editor/metadata/inputs/DynamicExifFields.tsx";
+import {formatDateFromString, formatTimeFromString} from "../../../../shared/utils/time.ts";
+import {parseResponse} from "@/lib/response-parser.ts";
 
 interface MetadataEditorProps {
   images: Image[];
   onFinish: (changedImages: Image[]) => void;
 }
 
-const editMetadataFormSchema = z.object({
-  dateText: z
-    .string()
-    .optional(),
-  timeText: z
-    .string()
-    .optional(),
-  location: z
-    .string()
-    .max(256, "Location address must be maximum 150 characters.")
-    .optional(),
-  latitude: z
-    .string()
-    .optional(),
-  longitude: z
-    .string()
-    .optional(),
-  exif: z
-    .record(z.string(), z.string().optional())
-});
+const editMetadataFormSchema = z
+  .object({
+    dateText: z.string().optional(),
+    timeText: z.string().optional(),
+    location: z
+      .string()
+      .max(256, "Location address must be maximum 256 characters.") // Hinweis: Fehlermeldung-Text angepasst auf 256
+      .optional(),
+    latitude: z.string().optional(),
+    longitude: z.string().optional(),
+    exif: z.record(z.string(), z.string().optional()),
+  })
+  .refine(
+    (data) => {
+      if (data.timeText && data.timeText.trim() !== "" && (!data.dateText || data.dateText.trim() === "")) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "Date must be filled if a time is specified.",
+      path: ["dateText"],
+    }
+  );
+
+const IGNORED_EXIF_KEYS = ["dateTimeOriginal", "DateTimeOriginal", "gpsLatitude", "GPSLatitude", "gpsLongitude", "GPSLongitude", "latitude", "longitude"];
 
 type MetadataFormValues = z.infer<typeof editMetadataFormSchema>;
-type ValidatedData = MetadataFormValues & { dateTimeISO?: string };
 
 export function MetadataEditor({images, onFinish}: MetadataEditorProps) {
   const form = useForm<MetadataFormValues>({
@@ -58,7 +65,7 @@ export function MetadataEditor({images, onFinish}: MetadataEditorProps) {
 
   const [isOtherFieldsOpen, setIsOtherFieldsOpen] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  const [validatedData, setValidatedData] = useState<ValidatedData | null>(null);
+  const [validatedData, setValidatedData] = useState<ImageMetadata | null>(null);
 
   const discoveredExifKeys = useMemo(() => {
     const uniqueKeys = new Set<string>();
@@ -67,19 +74,18 @@ export function MetadataEditor({images, onFinish}: MetadataEditorProps) {
         Object.keys(img.metadata).forEach((key) => uniqueKeys.add(key));
       }
     });
-    uniqueKeys.delete("dateTimeOriginal");
-    uniqueKeys.delete("gpsLatitude");
-    uniqueKeys.delete("gpsLongitude");
+    for(const ignoredKey of IGNORED_EXIF_KEYS) {
+      uniqueKeys.delete(ignoredKey);
+    }
     return Array.from(uniqueKeys);
   }, [images]);
 
   useEffect(() => {
     if (images.length === 0) {
-      form.reset({ location: "", dateText: "", timeText: "", exif: {} });
+      form.reset({location: "", dateText: "", timeText: "", exif: {}});
       return;
     }
 
-    // 1. Grab the metadata of the very first image to use as a baseline comparison
     const firstImg = images[0];
 
     // 2. Helper function to check if EVERY selected image shares the exact same value
@@ -106,34 +112,54 @@ export function MetadataEditor({images, onFinish}: MetadataEditorProps) {
       location: getCommonValue((img) => img.metadata?.location as string),
       latitude: getCommonValue((img) => img.metadata?.gpsLatitude?.toString()),
       longitude: getCommonValue((img) => img.metadata?.gpsLongitude?.toString()),
-      // If your backend splits dateTimeOriginal into separate fields or an ISO string:
-      dateText: getCommonValue((img) => img.metadata?.dateTimeOriginal?.split("T")[0]),
-      timeText: getCommonValue((img) => img.metadata?.dateTimeOriginal?.split("T")[1]?.slice(0, 8)),
+      dateText: getCommonValue((img) => img.metadata?.dateTimeOriginal && formatDateFromString(img.metadata?.dateTimeOriginal)),
+      timeText: getCommonValue((img) => img.metadata?.dateTimeOriginal && formatTimeFromString(img.metadata?.dateTimeOriginal)),
       exif: commonExif,
     });
 
   }, [images, form]);
 
   const onFormSubmit = (data: MetadataFormValues) => {
-    let finalIsoString = undefined;
+    let updatedMetadata: ImageMetadata = {};
 
+    // build dateTimeOriginal
     if (data.dateText) {
       const dateObj = new Date(data.dateText);
-      if (!isNaN(dateObj.getTime())) {
-        const [hours, minutes, seconds] = (data.timeText || "00:00:00").split(":");
+      if (data.timeText) {
+        const [hours, minutes, seconds] = data.timeText.split(":");
         dateObj.setHours(Number(hours || 0), Number(minutes || 0), Number(seconds || 0));
-        finalIsoString = dateObj.toISOString();
       }
+      updatedMetadata.dateTimeOriginal = dateObj.toISOString();
     }
 
-    setValidatedData({...data, dateTimeISO: finalIsoString});
+    // build location
+    if (data.latitude) {
+      updatedMetadata.gpsLatitude = parseFloat(data.latitude);
+    }
+    if (data.longitude) {
+      updatedMetadata.gpsLongitude = parseFloat(data.longitude);
+    }
+
+    // add other fields
+    updatedMetadata = {
+      ...data.exif,
+      ...updatedMetadata
+    };
+
+    setValidatedData(updatedMetadata);
     setIsConfirmOpen(true);
   };
 
   const executeEdit = async () => {
-    console.log("Executing metadata edit with ISO Date:", validatedData?.dateTimeISO);
-    // TODO: window.electron.editor.editMetadata(...)
-    onFinish(images);
+    if (!validatedData) return;
+
+    const changedImages = await parseResponse(
+      window.electron.editor.editMetadata(validatedData, images)
+    );
+
+    if(changedImages) {
+      onFinish(images);
+    }
   };
 
   return (
@@ -188,7 +214,7 @@ export function MetadataEditor({images, onFinish}: MetadataEditorProps) {
               </CollapsibleTrigger>
               <CollapsibleContent>
                 <div className="mt-2">
-                  <DynamicExifFields control={form.control} discoveredKeys={discoveredExifKeys} />
+                  <DynamicExifFields control={form.control} discoveredKeys={discoveredExifKeys}/>
                 </div>
               </CollapsibleContent>
             </Collapsible>

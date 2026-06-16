@@ -2,7 +2,7 @@ import {BrowserWindow, dialog, ipcMain} from 'electron';
 import {ApiResponse} from "../../../shared/types/electron-api.ts";
 import {readImageFilesRecursive} from '../services/image-service.ts';
 import {processThumbnailsInBackground} from '../services/thumbnail-service.ts';
-import {Image} from "../../../shared/types/image.ts";
+import {Image, ImageMetadata} from "../../../shared/types/image.ts";
 import {renameImages} from "../services/rename-service.ts";
 
 export function registerImageHandlers(mainWindow: BrowserWindow) {
@@ -56,4 +56,22 @@ export function registerImageHandlers(mainWindow: BrowserWindow) {
       };
     }
   });
+
+  ipcMain.handle('edit-metadata', async (_event, metadata: ImageMetadata, images: Image[]): Promise<ApiResponse<Image[]>> => {
+    try {
+      console.log(metadata);
+      // TODO: Implement the logic to edit metadata for the images
+      return {
+        success: true,
+        message: `Edited ${images.length} images successfully`,
+        data: [] // TODO
+      };
+    } catch (e) {
+      console.log(e)
+      return {
+        success: false,
+        message: 'Failed to edit metadata',
+      };
+    }
+  })
 }

@@ -68,7 +68,6 @@ export function FilenameEditor({ images, onFinish }: FilenameEditorProps) {
 
     if (changedImages) {
       onFinish(changedImages);
-      form.reset({ pattern: validatedData.pattern });
     }
   };
 
