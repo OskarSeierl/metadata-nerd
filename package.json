@@ -1,5 +1,6 @@
 {
   "name": "metadata-nerd",
+  "description": "A desktop application for managing and editing metadata of media files.",
   "private": true,
   "version": "0.0.1",
   "type": "module",
@@ -36,13 +37,15 @@
     "win": {
       "target": [
         "nsis"
-      ]
+      ],
+      "icon": "public/icons/favicon-32-32.png"
     },
     "linux": {
       "target": [
         "AppImage"
       ],
-      "category": "Utility"
+      "category": "Utility",
+      "icon": "public/icons/favicon-32-32.png"
     }
   },
   "dependencies": {
@@ -80,7 +83,6 @@
     "@vitejs/plugin-react": "^4.2.1",
     "electron": "^41.0.3",
     "electron-builder": "^24.13.3",
-    "electron-rebuild": "^3.2.9",
     "eslint": "^8.57.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",

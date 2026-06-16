@@ -8,7 +8,7 @@ import {registerSettingsHandlers} from "./handlers/settings-handler.ts";
 
 export const createMainWindow = (): BrowserWindow => {
   const win = new BrowserWindow({
-    icon: path.join(VITE_PUBLIC, 'electron-vite.svg'),
+    icon: path.join(VITE_PUBLIC, 'icons', 'favicon.png'),
     frame: false,
     titleBarStyle: 'hidden',
     webPreferences: {
@@ -30,10 +30,8 @@ export const createMainWindow = (): BrowserWindow => {
     win.loadURL(VITE_DEV_SERVER_URL);
     win.webContents.openDevTools({ mode: 'detach' });
   } else {
-    console.log(`Loading renderer from: ${path.join(RENDERER_DIST, 'index.html')}`);
     win.loadFile(path.join(RENDERER_DIST, 'index.html'));
-    win.webContents.openDevTools({ mode: 'detach' });
   }
 
   return win;
-}
+};
