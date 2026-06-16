@@ -29,7 +29,7 @@ export function ProtectedRenameConfirm({selectedImages, pattern, onFinish}: Prot
     e.preventDefault();
     setIsLoading(true);
     const changedImages = await parseResponse(window.electron.editor.renameImages(pattern, selectedImages));
-    if(changedImages) {
+    if (changedImages) {
       onFinish(changedImages);
     }
     setIsLoading(false);
@@ -49,26 +49,27 @@ export function ProtectedRenameConfirm({selectedImages, pattern, onFinish}: Prot
           <AlertDialogDescription>
             You are about to permanently rename <strong>{selectedImages.length}</strong> images. This action directly
             modifies the files on your disk and cannot be undone.
-            <Field>
-              <FieldLabel>Some example of the selected images</FieldLabel>
-              <FieldDescription>
-                <ul className="font-mono">
-                  {selectedImages.slice(0, exampleCount).map((image, index) => (
-                    <li key={index}>
-                      {image.filename} {"->"} {replacePlaceholdersInPattern(pattern, index, image)}
-                    </li>
-                  ))}
-                  {
-                    selectedImages.length > exampleCount && (
-                      <li>
-                        ... and {selectedImages.length - exampleCount} more
-                      </li>
-                    )
-                  }
-                </ul>
-              </FieldDescription>
-            </Field>
           </AlertDialogDescription>
+
+          <Field>
+            <FieldLabel>Some example of the selected images</FieldLabel>
+            <FieldDescription>
+              <ul className="font-mono">
+                {selectedImages.slice(0, exampleCount).map((image, index) => (
+                  <li key={index}>
+                    {image.filename} {"->"} {replacePlaceholdersInPattern(pattern, index, image)}
+                  </li>
+                ))}
+                {
+                  selectedImages.length > exampleCount && (
+                    <li>
+                      ... and {selectedImages.length - exampleCount} more
+                    </li>
+                  )
+                }
+              </ul>
+            </FieldDescription>
+          </Field>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
