@@ -2,7 +2,7 @@
   "name": "metadata-nerd",
   "description": "A desktop application for managing and editing metadata of media files.",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "scripts": {
     "dev": "vite",
