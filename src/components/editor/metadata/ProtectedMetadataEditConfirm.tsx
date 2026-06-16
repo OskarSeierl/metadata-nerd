@@ -5,8 +5,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog.tsx";
 import { Image } from "../../../../shared/types/image.ts";
-import { Field, FieldDescription, FieldLabel } from "@/components/ui/field.tsx";
-import { replacePlaceholdersInPattern } from "../../../../shared/utils/file.ts";
 import { Spinner } from "@/components/ui/spinner.tsx";
 import { useState, MouseEvent } from "react";
 
@@ -14,13 +12,11 @@ interface ProtectedRenameConfirmProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   selectedImages: Image[];
-  pattern: string;
   onConfirm: () => Promise<void>;
 }
 
-export function ProtectedRenameConfirm({ open, onOpenChange, selectedImages, pattern, onConfirm }: ProtectedRenameConfirmProps) {
+export function ProtectedMetadataEditConfirm({ open, onOpenChange, selectedImages, onConfirm }: ProtectedRenameConfirmProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const exampleCount = Math.min(5, selectedImages.length);
 
   const handleConfirmClick = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -29,7 +25,7 @@ export function ProtectedRenameConfirm({ open, onOpenChange, selectedImages, pat
       await onConfirm();
     } finally {
       setIsLoading(false);
-      onOpenChange(false); // Close modal when the operation is done
+      onOpenChange(false);
     }
   };
 
@@ -37,31 +33,11 @@ export function ProtectedRenameConfirm({ open, onOpenChange, selectedImages, pat
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Rename {selectedImages.length} images?</AlertDialogTitle>
+          <AlertDialogTitle>Edit {selectedImages.length} images?</AlertDialogTitle>
           <AlertDialogDescription>
             You are about to permanently rename <strong>{selectedImages.length}</strong> images. This action directly
             modifies the files on your disk and cannot be undone.
           </AlertDialogDescription>
-
-          <Field>
-            <FieldLabel>Some examples of the selected images</FieldLabel>
-            <FieldDescription>
-              <ul className="font-mono">
-                {selectedImages.slice(0, exampleCount).map((image, index) => (
-                  <li key={index}>
-                    {image.filename} {"->"} {replacePlaceholdersInPattern(pattern, index, image)}
-                  </li>
-                ))}
-                {
-                  selectedImages.length > exampleCount && (
-                    <li>
-                      ... and {selectedImages.length - exampleCount} more
-                    </li>
-                  )
-                }
-              </ul>
-            </FieldDescription>
-          </Field>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
@@ -69,7 +45,7 @@ export function ProtectedRenameConfirm({ open, onOpenChange, selectedImages, pat
             {isLoading ? (
               <>
                 <Spinner data-icon="inline-start" />
-                Renaming...
+                Editing...
               </>
             ) : (
               "Continue"

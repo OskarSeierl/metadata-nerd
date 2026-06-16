@@ -56,7 +56,7 @@ export function Editor({images, onImagesChange, onCloseFolder}: EditorProps) {
       <ResizablePanel defaultSize="25%">
         <ResizablePanelGroup orientation="vertical">
           <ResizablePanel defaultSize="70%">
-            <MetadataEditor images={selectedImagesArray} />
+            <MetadataEditor images={selectedImagesArray} onFinish={onImagesChange} />
           </ResizablePanel>
           <ResizableHandle withHandle />
           <ResizablePanel defaultSize="30%">

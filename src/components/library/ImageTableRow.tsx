@@ -2,6 +2,7 @@ import { memo } from 'react';
 import { Image } from "../../../shared/types/image.ts";
 import { Checkbox } from "@/components/ui/checkbox.tsx";
 import { TableCell, TableRow } from "@/components/ui/table.tsx";
+import {formatDate} from "../../../shared/utils/time.ts";
 
 interface ImageTableRowProps {
   img: Image;
@@ -33,7 +34,7 @@ export const ImageTableRow = memo(function ImageTableRow({ img, isSelected, onTo
       </TableCell>
 
       <TableCell className="text-right text-xs text-muted-foreground font-mono">
-        {new Date(img.fileModificationTime).toLocaleDateString()}
+        {formatDate(new Date(img.fileModificationTime))}
       </TableCell>
     </TableRow>
   );

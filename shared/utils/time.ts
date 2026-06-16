@@ -25,3 +25,11 @@ export const getPaddedMonthOfDate = (date: string = new Date().toISOString()): s
 export const getYearOfDate = (date: string = new Date().toISOString()): string => {
   return String(parseISODate(date).getFullYear());
 };
+
+export const formatDate = (date: Date): string => {
+  const year = getYearOfDate(date.toISOString());
+  const month = getPaddedMonthOfDate(date.toISOString());
+  const day = getPaddedDayOfDate(date.toISOString());
+
+  return `${year}-${month}-${day}`;
+};
