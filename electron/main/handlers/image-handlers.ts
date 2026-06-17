@@ -4,6 +4,7 @@ import {readImageFilesRecursive} from '../services/image-service.ts';
 import {processThumbnailsInBackground} from '../services/thumbnail-service.ts';
 import {Image, ImageMetadata} from "../../../shared/types/image.ts";
 import {renameImages} from "../services/rename-service.ts";
+import {updateMetadataOfImages} from "../services/metadata-service.ts";
 
 export function registerImageHandlers(mainWindow: BrowserWindow) {
   ipcMain.handle('select-folder', async (): Promise<ApiResponse<string>> => {
@@ -59,12 +60,11 @@ export function registerImageHandlers(mainWindow: BrowserWindow) {
 
   ipcMain.handle('edit-metadata', async (_event, metadata: ImageMetadata, images: Image[]): Promise<ApiResponse<Image[]>> => {
     try {
-      console.log(metadata);
-      // TODO: Implement the logic to edit metadata for the images
+      const updatedImages = await updateMetadataOfImages(metadata, images);
       return {
         success: true,
         message: `Edited ${images.length} images successfully`,
-        data: [] // TODO
+        data: updatedImages
       };
     } catch (e) {
       console.log(e)

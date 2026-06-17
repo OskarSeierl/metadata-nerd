@@ -16,12 +16,8 @@ export const replacePlaceholdersInPattern = (pattern: string, index: number, ima
 
     // Step B: Fallback to dynamic metadata lookup
     if (image.metadata && placeholder in image.metadata) {
-      const metaValue = image.metadata[placeholder];
-
-      // Ensure we only convert primitive values to strings (ignore nested objects/arrays if any exist)
-      if (typeof metaValue === 'string' || typeof metaValue === 'number' || typeof metaValue === 'boolean') {
-        return String(metaValue);
-      }
+      const metaValue = image.metadata[placeholder as keyof typeof image.metadata];
+      return String(metaValue);
     }
 
     // Step C: If the placeholder is completely unknown or the metadata is missing

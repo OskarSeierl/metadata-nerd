@@ -1,3 +1,5 @@
+import {ExifDateTime} from "exiftool-vendored";
+
 export const parseISODate = (isoString: string): Date => {
   return new Date(isoString);
 };
@@ -26,6 +28,12 @@ export const getYearOfDate = (date: string = new Date().toISOString()): string =
   return String(parseISODate(date).getFullYear());
 };
 
+export const parseMetadataDateToISO = (dateInput: string | ExifDateTime | undefined): string | undefined => {
+  if (!dateInput) return undefined;
+  const dateObject = typeof dateInput === "string" ? new Date(dateInput) : dateInput.toDate();
+  return dateObject.toISOString();
+};
+
 export const formatDate = (date: Date): string => {
   const year = getYearOfDate(date.toISOString());
   const month = getPaddedMonthOfDate(date.toISOString());
@@ -50,4 +58,4 @@ export const formatTime = (date: Date): string => {
 export const formatTimeFromString = (dateString: string): string => {
   const date = parseISODate(dateString);
   return formatTime(date);
-}
+};

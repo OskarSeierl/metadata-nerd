@@ -17,7 +17,7 @@ export interface ImageCacheService {
   saveCachedImage(
     filePath: string,
     filename: string,
-    metadata: ImageMetadata | null,
+    metadata: ImageMetadata,
     mtime: number
   ): number;
   updateCachedImage(

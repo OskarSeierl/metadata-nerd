@@ -75,7 +75,7 @@ export class SQLiteImageCache implements ImageCacheService {
   public saveCachedImage(
     filePath: string,
     filename: string,
-    metadata: ImageMetadata | null,
+    metadata: ImageMetadata,
     mtime: number
   ): number { // <-- 1. Change return type to number (or string if using UUIDs)
     const database = this.getDb();

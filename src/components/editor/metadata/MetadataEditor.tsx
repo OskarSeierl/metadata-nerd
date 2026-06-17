@@ -13,8 +13,8 @@ import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "@/components/
 import {HugeiconsIcon} from "@hugeicons/react";
 import {ArrowDown01Icon, ArrowUp01Icon} from "@hugeicons/core-free-icons";
 import {DynamicExifFields} from "@/components/editor/metadata/inputs/DynamicExifFields.tsx";
-import {formatDateFromString, formatTimeFromString} from "../../../../shared/utils/time.ts";
 import {parseResponse} from "@/lib/response-parser.ts";
+import {formatDateFromString, formatTimeFromString} from "../../../../shared/utils/time.ts";
 
 interface MetadataEditorProps {
   images: Image[];
@@ -27,7 +27,7 @@ const editMetadataFormSchema = z
     timeText: z.string().optional(),
     location: z
       .string()
-      .max(256, "Location address must be maximum 256 characters.") // Hinweis: Fehlermeldung-Text angepasst auf 256
+      .max(256, "Location address must be maximum 256 characters.")
       .optional(),
     latitude: z.string().optional(),
     longitude: z.string().optional(),
@@ -35,14 +35,29 @@ const editMetadataFormSchema = z
   })
   .refine(
     (data) => {
-      if (data.timeText && data.timeText.trim() !== "" && (!data.dateText || data.dateText.trim() === "")) {
-        return false;
-      }
-      return true;
+      return !(data.timeText && data.timeText.trim() !== "" && (!data.dateText || data.dateText.trim() === ""));
     },
     {
       message: "Date must be filled if a time is specified.",
       path: ["dateText"],
+    }
+  )
+  .refine(
+    (data) => {
+      return !(data.latitude && data.latitude.trim() !== "" && (!data.longitude || data.longitude.trim() === ""));
+    },
+    {
+      message: "Longitude is required if latitude is specified.",
+      path: ["longitude"],
+    }
+  )
+  .refine(
+    (data) => {
+      return !(data.longitude && data.longitude.trim() !== "" && (!data.latitude || data.latitude.trim() === ""));
+    },
+    {
+      message: "Latitude is required if longitude is specified.",
+      path: ["latitude"],
     }
   );
 
@@ -74,7 +89,7 @@ export function MetadataEditor({images, onFinish}: MetadataEditorProps) {
         Object.keys(img.metadata).forEach((key) => uniqueKeys.add(key));
       }
     });
-    for(const ignoredKey of IGNORED_EXIF_KEYS) {
+    for (const ignoredKey of IGNORED_EXIF_KEYS) {
       uniqueKeys.delete(ignoredKey);
     }
     return Array.from(uniqueKeys);
@@ -98,7 +113,7 @@ export function MetadataEditor({images, onFinish}: MetadataEditorProps) {
     // 3. Extract common dynamic EXIF keys
     const commonExif: Record<string, string> = {};
     if (firstImg.metadata) {
-      Object.keys(firstImg.metadata).forEach((key) => {
+      (Object.keys(firstImg.metadata) as Array<keyof typeof firstImg.metadata>).forEach((key) => {
         const firstVal = String(firstImg.metadata?.[key] || "");
         const allMatch = images.every((img) => String(img.metadata?.[key] || "") === firstVal);
         if (allMatch) {
@@ -109,11 +124,11 @@ export function MetadataEditor({images, onFinish}: MetadataEditorProps) {
 
     // 4. Reset the form with the newly calculated common baselines
     form.reset({
-      location: getCommonValue((img) => img.metadata?.location as string),
-      latitude: getCommonValue((img) => img.metadata?.gpsLatitude?.toString()),
-      longitude: getCommonValue((img) => img.metadata?.gpsLongitude?.toString()),
-      dateText: getCommonValue((img) => img.metadata?.dateTimeOriginal && formatDateFromString(img.metadata?.dateTimeOriginal)),
-      timeText: getCommonValue((img) => img.metadata?.dateTimeOriginal && formatTimeFromString(img.metadata?.dateTimeOriginal)),
+      location: getCommonValue((img) => img.metadata?.Location as string),
+      latitude: getCommonValue((img) => img.metadata?.GPSLatitude?.toString()),
+      longitude: getCommonValue((img) => img.metadata?.GPSLongitude?.toString()),
+      dateText: getCommonValue((img) => img.metadata?.DateTimeOriginal && formatDateFromString(img.metadata?.DateTimeOriginal)),
+      timeText: getCommonValue((img) => img.metadata?.DateTimeOriginal && formatTimeFromString(img.metadata?.DateTimeOriginal)),
       exif: commonExif,
     });
 
@@ -129,15 +144,17 @@ export function MetadataEditor({images, onFinish}: MetadataEditorProps) {
         const [hours, minutes, seconds] = data.timeText.split(":");
         dateObj.setHours(Number(hours || 0), Number(minutes || 0), Number(seconds || 0));
       }
-      updatedMetadata.dateTimeOriginal = dateObj.toISOString();
+      updatedMetadata.DateTimeOriginal = dateObj.toISOString();
     }
 
     // build location
     if (data.latitude) {
-      updatedMetadata.gpsLatitude = parseFloat(data.latitude);
+      updatedMetadata.GPSLatitude = parseFloat(data.latitude);
+      updatedMetadata.GPSLatitudeRef = updatedMetadata.GPSLatitude >= 0 ? "N" : "S";
     }
     if (data.longitude) {
-      updatedMetadata.gpsLongitude = parseFloat(data.longitude);
+      updatedMetadata.GPSLongitude = parseFloat(data.longitude);
+      updatedMetadata.GPSLongitudeRef = updatedMetadata.GPSLongitude >= 0 ? "E" : "W";
     }
 
     // add other fields
@@ -157,7 +174,7 @@ export function MetadataEditor({images, onFinish}: MetadataEditorProps) {
       window.electron.editor.editMetadata(validatedData, images)
     );
 
-    if(changedImages) {
+    if (changedImages) {
       onFinish(images);
     }
   };

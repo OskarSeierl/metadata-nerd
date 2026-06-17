@@ -44,8 +44,8 @@ export function ImageLibrary({images, selectedImages, onToggleSelectAll, onToggl
   const processedImages = useMemo(() => {
     const result = images.filter(img => {
       return !(
-        filters.includes(ImageFilter.NO_LOCATION) && img.metadata?.gpsLatitude
-        || filters.includes(ImageFilter.NO_TIME) && img.metadata?.dateTimeOriginal
+        filters.includes(ImageFilter.NO_LOCATION) && img.metadata?.GPSLatitude
+        || filters.includes(ImageFilter.NO_TIME) && img.metadata?.DateTimeOriginal
       );
     });
 

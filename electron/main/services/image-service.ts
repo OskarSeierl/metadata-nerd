@@ -1,23 +1,27 @@
 import path from 'node:path';
 import {promises as fs} from 'fs';
-import exifr from 'exifr';
 import {ALLOWED_IMAGE_EXTENSIONS} from '../../../shared/constants/allowed-image-extensions.ts';
 import {Image, ImageMetadata} from '../../../shared/types/image.ts';
 import {sqlLiteImageCache} from "../constants/cache.ts";
+import {ExifDateTime, ExifTime, Tags, ExifDate} from "exiftool-vendored";
+import {exiftool} from "../constants/exif-tool.ts";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const toImageMetadata = (exifData: any): ImageMetadata | null => {
-  if (!exifData) {
-    return null;
+export const toImageMetadata = (exifData: Tags): ImageMetadata => {
+  const updatedData: Record<string, string | number | boolean | undefined> = {};
+
+  for (const [key, value] of Object.entries(exifData) as [keyof Tags, unknown][]) {
+    if(typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+      updatedData[key] = value;
+    }
+    else if (value instanceof ExifDateTime || value instanceof ExifDate || value instanceof ExifTime || value instanceof ExifDateTime) {
+      updatedData[key] = value.toISOString() ?? undefined;
+    } else {
+      updatedData[key] = JSON.stringify(value);
+    }
   }
 
-  return {
-    ...exifData, // Include all other EXIF fields as well
-    dateTimeOriginal: exifData.DateTimeOriginal,
-    gpsLatitude: exifData.latitude,
-    gpsLongitude: exifData.longitude,
-  };
-}
+  return updatedData;
+};
 
 export const readImageFilesRecursive = async (
   dir: string,
@@ -70,13 +74,8 @@ export const readImageFilesRecursive = async (
           return {...cached, fromCache: true} as Image;
         }
 
-        const exifData = await exifr.parse(filePath, {
-          exif: true,
-          makerNote: false,
-          gps: true,
-        }).catch(() => null);
-
-        const metadata = toImageMetadata(exifData);
+        const exifTags = await exiftool.read(filePath);
+        const metadata = toImageMetadata(exifTags);
 
         const id = sqlLiteImageCache.saveCachedImage(filePath, path.basename(filePath), metadata, mtime);
 
@@ -89,7 +88,8 @@ export const readImageFilesRecursive = async (
           cachedAt: Math.floor(Date.now() / 1000),
           fromCache: false,
         } as Image;
-      } catch {
+      } catch (error) {
+        console.error(`Metadata read failed for ${filePath}:`, error);
         return {
           id: 0,
           fullPath: filePath,

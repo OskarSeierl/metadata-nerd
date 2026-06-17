@@ -1,15 +1,13 @@
+import {Tags} from "exiftool-vendored";
+import {Override} from "./override.ts";
+
 /**
  * Comprehensive EXIF and image metadata interface
  * Covers common fields from EXIF, IPTC, and file metadata
  */
-export interface ImageMetadata {
-  dateTimeOriginal?: string; // Date photo was taken (ISO 8601)
-
-  gpsLatitude?: number; // Decimal degrees
-  gpsLongitude?: number; // Decimal degrees
-
-  [key: string]: unknown; // Allow for additional unknown fields
-}
+export type ImageMetadata = Override<Tags, {
+  DateTimeOriginal?: string; // Date photo was taken (ISO 8601)
+}>;
 
 export interface Image {
   /** Unique ID (hash of fullPath) */

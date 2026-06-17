@@ -14,19 +14,14 @@ export const exampleImageData: Image = {
 
     // --- 2. Photographic & Exposure Data ---
     ISO: 100, // Note: Some raw parsers use ISOSpeedRatings, but ISO is the common ExifTool extraction
-    FocalLength: 21.8,
-    FocalLengthIn35mmFormat: 105,
     FNumber: 4,                 // EXIF spec uses FNumber, not Aperture
-    ExposureTime: 0.004,
     BrightnessValue: 7.49,
-    ExposureBiasValue: 0,
     ExposureProgram: 'Normal program',
     ExposureMode: 'Auto',
     MeteringMode: 'Pattern',
     WhiteBalance: 'Auto',
     LightSource: 'Unknown',
     Flash: 'Flash did not fire',
-    SubjectDistance: 3.5,
     FocusMode: 'Auto',
     SceneCaptureType: 'Standard',
     Contrast: 'Normal',
@@ -37,7 +32,6 @@ export const exampleImageData: Image = {
     DateTimeOriginal: '2001-02-19T05:40:05.000Z',
     DateTimeDigitized: '2001-02-19T05:40:05.000Z',
     DateTime: '2008-03-15T12:15:30.000Z',
-    SubsecTimeOriginal: '00',
 
     // --- 4. File & Display Properties ---
     ImageWidth: 2832,
@@ -45,7 +39,6 @@ export const exampleImageData: Image = {
     XResolution: 72,
     YResolution: 72,
     ResolutionUnit: 'inches',
-    Orientation: 'Horizontal (normal)',
     ColorSpace: 1,
 
     // --- 5. Location Data (GPS) ---
