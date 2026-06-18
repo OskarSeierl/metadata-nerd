@@ -2,7 +2,7 @@
   "name": "metadata-nerd",
   "description": "A desktop application for managing and editing metadata of media files.",
   "private": true,
-  "version": "0.0.3",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -22,7 +22,9 @@
   "build": {
     "appId": "com.metadata-nerd.app",
     "productName": "Metadata Nerd",
-    "asarUnpack": ["node_modules/exiftool-vendored.*/**/*"],
+    "asarUnpack": [
+      "node_modules/exiftool-vendored.*/**/*"
+    ],
     "files": [
       "dist/**/*",
       "dist-electron/**/*",
