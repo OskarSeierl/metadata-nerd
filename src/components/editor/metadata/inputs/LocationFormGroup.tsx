@@ -101,7 +101,7 @@ export function LocationFormGroup<TFieldValues extends FieldValues>({
                     }}
                   />
                   <InputGroupAddon align="inline-end">
-                    {isLoading ? <Spinner size="sm"/> : <HugeiconsIcon icon={Location01Icon}/>}
+                    {isLoading ? <Spinner/> : <HugeiconsIcon icon={Location01Icon}/>}
                   </InputGroupAddon>
                 </InputGroup>
               </PopoverAnchor>

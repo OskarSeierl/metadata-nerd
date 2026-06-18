@@ -2,7 +2,7 @@ import { ExifTool } from "exiftool-vendored";
 import path from "node:path";
 import {APP_ROOT, VITE_DEV_SERVER_URL} from "./constants.ts";
 
-export const LIGHTWEIGHT_ARGS = [
+export const LIGHTWEIGHT_READ_ARGS = [
   "-fast2",
   "--MakerNotes:all",
   "--ThumbnailImage",
@@ -20,7 +20,7 @@ export const exiftool = new ExifTool({
 
   useMWG: true,
 
-  readArgs: LIGHTWEIGHT_ARGS,
+  readArgs: LIGHTWEIGHT_READ_ARGS,
 
   exiftoolPath: () => {
     const isWin = process.platform === "win32";

@@ -5,15 +5,26 @@ import {Image, ImageMetadata} from '../../../shared/types/image.ts';
 import {sqlLiteImageCache} from "../constants/cache.ts";
 import {ExifDateTime, ExifTime, Tags, ExifDate} from "exiftool-vendored";
 import {exiftool} from "../constants/exif-tool.ts";
+import {TagNames} from "exiftool-vendored/dist/Tags";
+
+const IGNORED_METADATA_KEYS = new Set([
+  'warnings', 'errors',
+  'Directory', 'FileName', 'FilePath', 'SourceFile',
+  'RedTRC', 'BlueTRC', 'GreenTRC', 'MPImage2', 'HDRPlusMarkerNote'
+]);
+const VALID_TAGS = new Set(Object.values(TagNames));
 
 export const toImageMetadata = (exifData: Tags): ImageMetadata => {
   const updatedData: Record<string, string | number | boolean | undefined> = {};
 
   for (const [key, value] of Object.entries(exifData) as [keyof Tags, unknown][]) {
-    if(typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
-      updatedData[key] = value;
+    if(IGNORED_METADATA_KEYS.has(key) || !VALID_TAGS.has(key)) {
+      continue;
     }
-    else if (value instanceof ExifDateTime || value instanceof ExifDate || value instanceof ExifTime || value instanceof ExifDateTime) {
+
+    if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+      updatedData[key] = value;
+    } else if (value instanceof ExifDateTime || value instanceof ExifDate || value instanceof ExifTime || value instanceof ExifDateTime) {
       updatedData[key] = value.toISOString() ?? undefined;
     } else {
       updatedData[key] = JSON.stringify(value);

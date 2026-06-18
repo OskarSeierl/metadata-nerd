@@ -1,9 +1,9 @@
 import { app, protocol } from 'electron';
 import path from 'node:path';
 import { promises as fs } from 'fs';
-import exifr from 'exifr';
 import sharp from 'sharp';
 import { Image } from '../../../shared/types/image.ts';
+import {exiftool} from "../constants/exif-tool.ts";
 
 protocol.registerSchemesAsPrivileged([
   { scheme: 'thumb', privileges: { bypassCSP: true, standard: true, secure: true, supportFetchAPI: true } },
@@ -54,11 +54,12 @@ export async function generateAndStoreThumbnail(
       // File doesn't exist, proceed with generation
     }
 
-    let thumbData = await exifr.thumbnail(filePath).catch(() => null);
-
-    if (!thumbData) {
+    try {
+      await exiftool.extractThumbnail(filePath, thumbPath);
+    } catch {
+      console.warn(`EXIF thumbnail extraction failed for ${filePath}`);
       try {
-        thumbData = await sharp(filePath, { failOn: "none" })
+        const thumbData = await sharp(filePath, { failOn: "none" })
           .resize({
             width: 256,
             height: 256,
@@ -69,17 +70,17 @@ export async function generateAndStoreThumbnail(
           .toBuffer();
 
         console.log(`Generated fallback thumbnail for: ${path.basename(filePath)}`);
+
+        if (thumbData) {
+          await fs.writeFile(getThumbnailPathFromID(thumbId), thumbData).catch((err) => {
+            console.warn(`Failed to write thumbnail for ${filePath}`, err);
+          });
+          return true;
+        }
       } catch (sharpError) {
         console.warn(`Could not generate thumbnail for ${filePath}`, sharpError);
         return false;
       }
-    }
-
-    if (thumbData) {
-      await fs.writeFile(getThumbnailPathFromID(thumbId), thumbData).catch((err) => {
-        console.warn(`Failed to write thumbnail for ${filePath}`, err);
-      });
-      return true;
     }
   } catch (error) {
     console.error(`Error generating thumbnail for ${filePath}:`, error);
