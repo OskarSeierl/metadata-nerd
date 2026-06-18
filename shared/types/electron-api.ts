@@ -14,7 +14,7 @@ export interface ElectronAPI {
   },
   editor: {
     renameImages: (pattern: string, images: Image[]) => Promise<ApiResponse<Image[]>>;
-    editMetadata: (metadata: ImageMetadata, images: Image[]) => Promise<ApiResponse<Image[]>>;
+    editMetadata: (metadata: ImageMetadata, images: Image[], keepOriginal: boolean) => Promise<ApiResponse<Image[]>>;
   },
   settings: {
     deleteCache: () => Promise<ApiResponse<void>>;

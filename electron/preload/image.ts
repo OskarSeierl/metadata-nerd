@@ -28,6 +28,6 @@ export const renameImages = async (pattern: string, images: Image[]): Promise<Ap
   return ipcRenderer.invoke('rename-images', pattern, images);
 };
 
-export const editMetadata = async (metadata: ImageMetadata, images: Image[]): Promise<ApiResponse<Image[]>> => {
-  return ipcRenderer.invoke('edit-metadata', metadata, images);
+export const editMetadata = async (metadata: ImageMetadata, images: Image[], keepOriginal: boolean): Promise<ApiResponse<Image[]>> => {
+  return ipcRenderer.invoke('edit-metadata', metadata, images, keepOriginal);
 };

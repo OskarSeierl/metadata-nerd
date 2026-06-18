@@ -1,6 +1,13 @@
 import {Image, ImageMetadata} from "../../../../shared/types/image.ts";
 import {TypographyLarge} from "@/components/ui/typography/typographyLarge.tsx";
-import {Field, FieldDescription, FieldGroup, FieldLegend, FieldSeparator, FieldSet} from "@/components/ui/field.tsx";
+import {
+  Field,
+  FieldDescription,
+  FieldGroup,
+  FieldLegend,
+  FieldSeparator,
+  FieldSet
+} from "@/components/ui/field.tsx";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -11,10 +18,12 @@ import {DateTimeFormGroup} from "@/components/editor/metadata/inputs/DateTimeFor
 import {LocationFormGroup} from "@/components/editor/metadata/inputs/LocationFormGroup.tsx";
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "@/components/ui/collapsible.tsx";
 import {HugeiconsIcon} from "@hugeicons/react";
-import {ArrowDown01Icon, ArrowUp01Icon} from "@hugeicons/core-free-icons";
+import {AnonymousIcon, SafeIcon} from "@hugeicons/core-free-icons";
 import {DynamicExifFields} from "@/components/editor/metadata/inputs/DynamicExifFields.tsx";
 import {parseResponse} from "@/lib/response-parser.ts";
 import {formatDateFromString, formatTimeFromString} from "../../../../shared/utils/time.ts";
+import {Switch} from "@/components/ui/switch.tsx";
+import {Item, ItemActions, ItemContent, ItemMedia, ItemTitle} from "@/components/ui/item.tsx";
 
 interface MetadataEditorProps {
   images: Image[];
@@ -78,9 +87,11 @@ export function MetadataEditor({images, onFinish}: MetadataEditorProps) {
     },
   });
 
-  const [isOtherFieldsOpen, setIsOtherFieldsOpen] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [validatedData, setValidatedData] = useState<ImageMetadata | null>(null);
+
+  const [keepOriginal, setKeepOriginal] = useState(false);
+  const [advancedEdit, setAdvancedEdit] = useState(false);
 
   const discoveredExifKeys = useMemo(() => {
     const uniqueKeys = new Set<string>();
@@ -158,10 +169,12 @@ export function MetadataEditor({images, onFinish}: MetadataEditorProps) {
     }
 
     // add other fields
-    updatedMetadata = {
-      ...data.exif,
-      ...updatedMetadata
-    };
+    if(advancedEdit) {
+      updatedMetadata = {
+        ...data.exif,
+        ...updatedMetadata
+      };
+    }
 
     setValidatedData(updatedMetadata);
     setIsConfirmOpen(true);
@@ -171,7 +184,7 @@ export function MetadataEditor({images, onFinish}: MetadataEditorProps) {
     if (!validatedData) return;
 
     const changedImages = await parseResponse(
-      window.electron.editor.editMetadata(validatedData, images)
+      window.electron.editor.editMetadata(validatedData, images, keepOriginal)
     );
 
     if (changedImages) {
@@ -185,6 +198,37 @@ export function MetadataEditor({images, onFinish}: MetadataEditorProps) {
 
       <form id="metadata-editor-form" onSubmit={form.handleSubmit(onFormSubmit)}>
         <FieldGroup>
+          <Item variant="outline">
+            <ItemMedia variant="icon">
+              <HugeiconsIcon icon={SafeIcon}/>
+            </ItemMedia>
+            <ItemContent>
+              <ItemTitle>Keep original files</ItemTitle>
+            </ItemContent>
+            <ItemActions>
+              <Switch
+                checked={keepOriginal}
+                onCheckedChange={setKeepOriginal}
+                aria-label="Keep original files"
+              />
+            </ItemActions>
+          </Item>
+          <Item variant="outline">
+            <ItemMedia variant="icon">
+              <HugeiconsIcon icon={AnonymousIcon}/>
+            </ItemMedia>
+            <ItemContent>
+              <ItemTitle>Advanced edit</ItemTitle>
+            </ItemContent>
+            <ItemActions>
+              <Switch
+                checked={advancedEdit}
+                onCheckedChange={setAdvancedEdit}
+                aria-label="Advanced edit"
+              />
+            </ItemActions>
+          </Item>
+          <FieldSeparator/>
           <FieldSet>
             <FieldLegend>Datetime</FieldLegend>
             <DateTimeFormGroup
@@ -205,15 +249,14 @@ export function MetadataEditor({images, onFinish}: MetadataEditorProps) {
           </FieldSet>
           <FieldSeparator/>
           <FieldSet>
-            <Collapsible open={isOtherFieldsOpen} onOpenChange={setIsOtherFieldsOpen}>
+            <Collapsible open={advancedEdit}>
               <CollapsibleTrigger className="w-full">
                 <FieldLegend className="flex align-center justify-between">
                   <div>Other Fields (Advanced)</div>
-                  <HugeiconsIcon icon={isOtherFieldsOpen ? ArrowUp01Icon : ArrowDown01Icon}/>
                 </FieldLegend>
                 <FieldDescription>
                   {
-                    isOtherFieldsOpen ? (
+                    advancedEdit ? (
                       <>
                         All other metadata fields can be edited without without application safeguards. This means that
                         if you
@@ -223,7 +266,7 @@ export function MetadataEditor({images, onFinish}: MetadataEditorProps) {
                       </>
                     ) : (
                       <em>
-                        Press to show more...
+                        Enable advanced edit to view...
                       </em>
                     )
                   }

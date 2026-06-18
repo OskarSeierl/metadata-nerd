@@ -10,7 +10,6 @@ import {TagNames} from "exiftool-vendored/dist/Tags";
 const IGNORED_METADATA_KEYS = new Set([
   'warnings', 'errors',
   'Directory', 'FileName', 'FilePath', 'SourceFile',
-  'RedTRC', 'BlueTRC', 'GreenTRC', 'MPImage2', 'HDRPlusMarkerNote'
 ]);
 const VALID_TAGS = new Set(Object.values(TagNames));
 

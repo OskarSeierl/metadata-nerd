@@ -1,12 +1,12 @@
-import { app, protocol } from 'electron';
+import {app, protocol} from 'electron';
 import path from 'node:path';
-import { promises as fs } from 'fs';
+import {promises as fs} from 'fs';
 import sharp from 'sharp';
-import { Image } from '../../../shared/types/image.ts';
+import {Image} from '../../../shared/types/image.ts';
 import {exiftool} from "../constants/exif-tool.ts";
 
 protocol.registerSchemesAsPrivileged([
-  { scheme: 'thumb', privileges: { bypassCSP: true, standard: true, secure: true, supportFetchAPI: true } },
+  {scheme: 'thumb', privileges: {bypassCSP: true, standard: true, secure: true, supportFetchAPI: true}},
 ]);
 
 export const clearThumbnails = async (): Promise<void> => {
@@ -35,64 +35,67 @@ export async function initializeThumbnailDir(): Promise<void> {
   try {
     await fs.access(dir);
   } catch {
-    await fs.mkdir(dir, { recursive: true });
+    await fs.mkdir(dir, {recursive: true});
   }
 }
 
-export async function generateAndStoreThumbnail(
+const thumbnailExists = async (thumbId: string): Promise<boolean> => {
+  try {
+    await fs.access(getThumbnailPathFromID(thumbId));
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+const generateAndStoreThumbnail = async (filePath: string, thumbId: string): Promise<boolean> => {
+  const thumbPath = getThumbnailPathFromID(thumbId);
+
+  try {
+    await exiftool.extractThumbnail(filePath, thumbPath);
+  } catch {
+    console.warn(`EXIF thumbnail extraction failed for ${filePath}`);
+    try {
+      const thumbData = await sharp(filePath, {failOn: "none"})
+        .resize({
+          width: 256,
+          height: 256,
+          fit: 'inside',
+          withoutEnlargement: true,
+        })
+        .jpeg({quality: 80})
+        .toBuffer();
+
+      console.log(`Generated fallback thumbnail for: ${path.basename(filePath)}`);
+
+      if (thumbData) {
+        await fs.writeFile(getThumbnailPathFromID(thumbId), thumbData).catch((err) => {
+          console.warn(`Failed to write thumbnail for ${filePath}`, err);
+        });
+        return true;
+      }
+    } catch (sharpError) {
+      console.warn(`Could not generate thumbnail for ${filePath}`, sharpError);
+      return false;
+    }
+  }
+  return false;
+};
+
+export const generateAndStoreMissingThumbnail = async (
   filePath: string,
   thumbId: string
-): Promise<boolean> {
-  try {
-    const thumbPath = getThumbnailPathFromID(thumbId);
-
-    try {
-      await fs.access(thumbPath);
-      console.log(`Thumbnail already exists: ${thumbPath}`);
-      return true;
-    } catch {
-      // File doesn't exist, proceed with generation
-    }
-
-    try {
-      await exiftool.extractThumbnail(filePath, thumbPath);
-    } catch {
-      console.warn(`EXIF thumbnail extraction failed for ${filePath}`);
-      try {
-        const thumbData = await sharp(filePath, { failOn: "none" })
-          .resize({
-            width: 256,
-            height: 256,
-            fit: 'inside',
-            withoutEnlargement: true,
-          })
-          .jpeg({ quality: 80 })
-          .toBuffer();
-
-        console.log(`Generated fallback thumbnail for: ${path.basename(filePath)}`);
-
-        if (thumbData) {
-          await fs.writeFile(getThumbnailPathFromID(thumbId), thumbData).catch((err) => {
-            console.warn(`Failed to write thumbnail for ${filePath}`, err);
-          });
-          return true;
-        }
-      } catch (sharpError) {
-        console.warn(`Could not generate thumbnail for ${filePath}`, sharpError);
-        return false;
-      }
-    }
-  } catch (error) {
-    console.error(`Error generating thumbnail for ${filePath}:`, error);
+): Promise<boolean> => {
+  if (await thumbnailExists(thumbId)) {
+    return true;
   }
-
-  return false;
-}
+  return await generateAndStoreThumbnail(filePath, thumbId);
+};
 
 export const processThumbnailsInBackground = async (images: Image[], sender: Electron.WebContents) => {
   for (const img of images) {
     try {
-      const success = await generateAndStoreThumbnail(img.fullPath, img.id.toString());
+      const success = await generateAndStoreMissingThumbnail(img.fullPath, img.id.toString());
       if (success) {
         sender.send('thumbnail-ready', img.id);
       }

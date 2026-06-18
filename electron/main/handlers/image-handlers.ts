@@ -58,9 +58,9 @@ export function registerImageHandlers(mainWindow: BrowserWindow) {
     }
   });
 
-  ipcMain.handle('edit-metadata', async (_event, metadata: ImageMetadata, images: Image[]): Promise<ApiResponse<Image[]>> => {
+  ipcMain.handle('edit-metadata', async (_event, metadata: ImageMetadata, images: Image[], keepOriginal: boolean): Promise<ApiResponse<Image[]>> => {
     try {
-      const updatedImages = await updateMetadataOfImages(metadata, images);
+      const updatedImages = await updateMetadataOfImages(metadata, images, keepOriginal);
       return {
         success: true,
         message: `Edited ${images.length} images successfully`,
