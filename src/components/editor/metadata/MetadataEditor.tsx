@@ -18,12 +18,13 @@ import {DateTimeFormGroup} from "@/components/editor/metadata/inputs/DateTimeFor
 import {LocationFormGroup} from "@/components/editor/metadata/inputs/LocationFormGroup.tsx";
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "@/components/ui/collapsible.tsx";
 import {HugeiconsIcon} from "@hugeicons/react";
-import {AnonymousIcon, SafeIcon} from "@hugeicons/core-free-icons";
+import {AnonymousIcon, InformationCircleIcon, SafeIcon} from "@hugeicons/core-free-icons";
 import {DynamicExifFields} from "@/components/editor/metadata/inputs/DynamicExifFields.tsx";
 import {parseResponse} from "@/lib/response-parser.ts";
 import {formatDateFromString, formatTimeFromString} from "../../../../shared/utils/time.ts";
 import {Switch} from "@/components/ui/switch.tsx";
 import {Item, ItemActions, ItemContent, ItemMedia, ItemTitle} from "@/components/ui/item.tsx";
+import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip.tsx";
 
 interface MetadataEditorProps {
   images: Image[];
@@ -169,7 +170,7 @@ export function MetadataEditor({images, onFinish}: MetadataEditorProps) {
     }
 
     // add other fields
-    if(advancedEdit) {
+    if (advancedEdit) {
       updatedMetadata = {
         ...data.exif,
         ...updatedMetadata
@@ -203,7 +204,17 @@ export function MetadataEditor({images, onFinish}: MetadataEditorProps) {
               <HugeiconsIcon icon={SafeIcon}/>
             </ItemMedia>
             <ItemContent>
-              <ItemTitle>Keep original files</ItemTitle>
+              <ItemTitle>
+                Keep original files
+                <Tooltip>
+                  <TooltipTrigger>
+                    <HugeiconsIcon icon={InformationCircleIcon} size="20"/>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    Enabling this option will safe the modified images as new files in the .edited folder, leaving the original files untouched. This is useful if you want to preserve the original metadata for archival purposes or if you want to create multiple versions of the same image with different metadata.
+                  </TooltipContent>
+                </Tooltip>
+              </ItemTitle>
             </ItemContent>
             <ItemActions>
               <Switch
@@ -218,7 +229,17 @@ export function MetadataEditor({images, onFinish}: MetadataEditorProps) {
               <HugeiconsIcon icon={AnonymousIcon}/>
             </ItemMedia>
             <ItemContent>
-              <ItemTitle>Advanced edit</ItemTitle>
+              <ItemTitle>
+                Advanced edit
+                <Tooltip>
+                  <TooltipTrigger>
+                    <HugeiconsIcon icon={InformationCircleIcon} size="20"/>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    Enabling advanced edit allows you to modify all metadata fields, including those that may not be recognized by the application. Use with caution, as entering invalid data may cause issues when viewing or editing the image in the future.
+                  </TooltipContent>
+                </Tooltip>
+              </ItemTitle>
             </ItemContent>
             <ItemActions>
               <Switch
@@ -296,5 +317,6 @@ export function MetadataEditor({images, onFinish}: MetadataEditorProps) {
         onConfirm={executeEdit}
       />
     </div>
-  );
+  )
+    ;
 }
